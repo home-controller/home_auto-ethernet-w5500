@@ -1,3 +1,6 @@
+#ifndef _pString_h
+#define _pString_h
+
 #include <Arduino.h>
 
 // remember "a" is an array of char, char a[]; 'c' only works for 1 char not an array ie char c = 'c';
@@ -31,3 +34,4 @@ void SplitK1( char s[],  const char k[], char r[], byte rLength);
 
 
 ;
+#endif

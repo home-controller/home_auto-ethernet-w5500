@@ -20,9 +20,11 @@
 #include <SPI.h>
 #include <EEPROM.h>
 #include <Ethernet.h>
+#include <PubSubClient.h>
 #include "pString.h"
 #include "html.h"
 #include "relays.h"
+#include "mqtt.h"
 
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
@@ -30,6 +32,10 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x00//0xED
 };
 IPAddress ip(192, 168, 1, 180);
+IPAddress dns(192, 168, 11, 1);
+IPAddress gateway(192, 168, 11, 1);
+IPAddress subnet(255, 255, 240, 0);
+
 
 // Initialize the Ethernet server library
 // with the IP address and port you want to use
@@ -55,7 +61,7 @@ void setup() {
   //Ethernet.init(15);  // ESP8266 with Adafruit Featherwing Ethernet
   //Ethernet.init(33);  // ESP32 with Adafruit Featherwing Ethernet
   id = EEPROM.read(eepromIdAddr);
-  //id=0xFF; hard set of board id
+  //id=0xFF; hard set of board id  
   if(id == 0xFF){
     Serial.print(F("Setting") );
     EEPROM.update(eepromIdAddr, NextBoardId);
@@ -67,7 +73,9 @@ void setup() {
   Serial.println(id);
   ip[3] += id;
   mac[5] += id;
-  
+
+  // MQTT setup.
+  MQTT_setup ();
   // Open serial communications and wait for port to open:
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
@@ -82,7 +90,7 @@ void setup() {
     delay(2*1000);
 
   // start the Ethernet connection and the server:
-  Ethernet.begin(mac, ip);
+  Ethernet.begin(mac, ip, dns, gateway,subnet);
 
   // Check for Ethernet hardware present
   if (Ethernet.hardwareStatus() == EthernetNoHardware) {
@@ -137,7 +145,17 @@ void setup() {
 
 void loop() {
   //byte i;
+
+//Check for MQTT messages.
+  if (!mqtt_client.connected()) {
+    if(reconnect() ){
+    }
+  }
+  if (mqtt_client.connected()) { mqtt_client.loop(); }
+
   // listen for incoming clients
+
+  
   EthernetClient client = server.available();
   if (client) {
     Serial.println("new client");
