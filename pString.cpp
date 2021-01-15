@@ -3,6 +3,22 @@
 #include "pString.h"
 //{ the k String is looped through a char at a time }
 // if k or c not found in DelToC etc then do nothing
+//
+//struct v {
+//   union { // anonymous union
+//      struct { int i, j; }; // anonymous structure
+//      struct { long k, l; } w;
+//   };
+//   int m;
+//} v1;
+
+byte StrLenZ(const char z[]){
+  byte i;
+  for(i=0; i< 0xFF; i++){
+    if(z[i] == 0){ return i; }
+  }
+  return 0xFF; //string is longer than can be returned in a byte or no 0 turmination for the string.
+}
 
 void pPrint(const char s[]){
   byte i;
@@ -60,6 +76,19 @@ boolean StrCom(const char s1[], const char s2[]){// True if the string array hav
   }
   return false;
 }
+
+boolean StrComSZ(const char s1[], const char z1[] ){
+  byte i, l;
+  l = StrLenZ(z1);
+  if (l != s1[i]) return false;
+  for(i=1;i<=s1[0]; i++){
+    if((s1[i] != z1[i-1]) ) {return false; }
+  }
+  
+  return true;
+ 
+}
+
 
 byte FindFirstC(const char s[], const char c){
 byte  x;
