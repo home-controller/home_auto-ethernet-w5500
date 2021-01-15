@@ -136,10 +136,7 @@ void setup() {
   Serial.println('0',DEC);
   pPrintln(_getH);
   Serial.println();
-  for (x=0; x< sizeof(pinsA); x++){
-    updateRelayState(x+1, (byte) light_off); //turn all relays off at startup
-    pinMode(pinsA[x], OUTPUT);
-  }
+  SetUpRelays();
 }
 
 

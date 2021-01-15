@@ -14,4 +14,6 @@ boolean reconnect();
 void callback(char* topic, byte* payload, unsigned int length);
 void MQTT_setup();
 
+void MqttPushRelayState(byte r);
+
 #endif

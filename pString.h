@@ -12,11 +12,15 @@
 void pPrint(const char s[]);
 void pPrintln(const char s[]);
 
+byte StrLenZ(const char s[]);
+
 //{ the k String is looped through a char at a time }
 byte InStringS(const char s1[], const char s2[], boolean start = true);
 boolean StrCom(const char s1[], const char s2[] );// True if the string array have the same values. (i.e. s1[0..s1[0]] == s2[0..s1[0]] )
+boolean StrComSZ(const char s1[], const char z1[] );
 byte FindFirstC(const char s[], const char c);
 byte FindFirstK(const char s[], const char k[]);
+
 
 void DelFirst(char s[], byte n);
 void DelToC(char s[], byte c);
