@@ -5,12 +5,14 @@
 
 
 #define no_of_relays 2
-#define initHLa ={0,0}
+#define initHLa ={LOW,LOW}// the value to use to turn the relay etc. on. e.g. 0 for most relay modules, as they are pull low to turn on.
 #define relayPins 3,4
+#define defaultOffV 2 //2 is for set pin to input mode to turn off.
 ;
 extern byte pinsA[no_of_relays];
 extern byte relayState[no_of_relays];// 0 = off, 1 = on
-extern byte relayOnVal[no_of_relays];// eg 0 for pull the relay LOW to turn on, 1 for pull high. Pull opisit to turn off. Or should it be set to input to turn off?
+extern byte relayOnVal[no_of_relays];// eg 0 for pull the relay LOW to turn on, 1 for pull high. Pull opposite to turn off. Or should it be set to input to turn off?
+// Should maybe set pin to input to turn off instead? 
 
 void SetUpRelays();
 

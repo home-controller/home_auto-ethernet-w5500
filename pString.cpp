@@ -1,5 +1,5 @@
 // pascal type strings.
-// Arrays of char with s[0] bing the string length. So max length of 255
+// Arrays of char with s[0] being the string length. So max length of 255
 #include "pString.h"
 //{ the k String is looped through a char at a time }
 // if k or c not found in DelToC etc then do nothing
@@ -17,7 +17,7 @@ byte StrLenZ(const char z[]){
   for(i=0; i< 0xFF; i++){
     if(z[i] == 0){ return i; }
   }
-  return 0xFF; //string is longer than can be returned in a byte or no 0 turmination for the string.
+  return 0xFF; //string is longer than can be returned in a byte or no 0 termination for the string.
 }
 
 void pPrint(const char s[]){
@@ -135,7 +135,7 @@ byte x;
 }
 
 void Split1(char s[], byte n, char r[], byte rLength){
-//Split at n. Return first part in r. Del retuned part from s leaving n as first char.
+//Split at n. Return first part in r. Del returned part from s leaving n as first char.
 //Split off and Return s up to but not including n
   if(n>1){
     CopyFirst(s, n - 1 , r, rLength);
