@@ -9,14 +9,18 @@
 byte pinsA[no_of_relays]  = { relayPins };
 byte relayState[no_of_relays];
 byte relayOnVal[no_of_relays] initHLa ;// eg 0 for pull the relay LOW to turn on, 1 for pull high. Pull opisit to turn off. Or should it be set to input to turn off?
+byte relayOffVal[no_of_relays];//0: pull low to turn of, 1: pull high, 2: set pin to INPUT mode.
 
 void SetUpRelays(){
   byte i;
+  byte off = 0;// used to set type for func overloading
   for(i=0;i<no_of_relays;i++){
-    pinMode(pinsA[i], OUTPUT);
-    digitalWrite(pinsA[i], relayOnVal[i] xor 0xFF);
-    relayState[i] = 0;
-//    UpdateRelayState(x+1, (byte) light_off); //turn all relays off at startup
+    //changed to use changing to input to turn off.
+    relayOffVal[i] = defaultOffV;
+//    pinMode(pinsA[i], OUTPUT);
+//    digitalWrite(pinsA[i], relayOnVal[i] xor 0xFF);
+//    relayState[i] = 0;
+    UpdateRelayState(i+1, off); //turn all relays off at startup
   }
 }
 
@@ -28,40 +32,49 @@ void ToggleRelayState(byte n){// n = 1 for first relay
 }
 
 void UpdateRelayState(byte n, byte v){// n = 1 for first relay
-  byte output;// if relay is pulled low for on this will be 0 if v is 1 and 1 if v = 0.
+  //This should be the only function used to turn the relays on/off etc.
+  // v = 0 to turn off & 1 to turn on
   if (n >= no_of_relays){
     Serial.println( F("Trying to switch more relays than we have.") );
     return;
   }
   if(n<1){
-    Serial.println( F("Relay No can't be < 1") );
+    Serial.println( F("Relay No. can't be < 1") );
     return;
   }
-  if(relayOnVal[n-1] == 0){
-    if(v == 0) {output = HIGH; }//pull relay pin in1 HIGH to turn it off
-    else if (v == 1){ output = LOW; } //pull relay in1 pin LOW to turn it on
-    else {
-      Serial.println( F("in fuc updateRelayState v out of range") );
-      return;
-    }
-  } else output = v;
+  n--;//as the arrays start at 0 for the first elemet 0 will be relay 1 from here.
+#ifdef _debug_relays
   Serial.print("v = ");
   Serial.println( v);
   Serial.print("output = ");
   Serial.println( output);
   Serial.print("pin = ");
-  Serial.println(pinsA[n - 1] );
-  relayState[n - 1] = v;
+  Serial.println(pinsA[n] );
+#endif  
+  relayState[n] = v;
   if(v <= 1){
-    digitalWrite(pinsA[n - 1], output);
+    if(v==0){
+      if(relayOffVal[n] <=1){
+        pinMode(pinsA[n], OUTPUT);
+        digitalWrite(pinsA[n], relayOffVal[n]);
+      } else {// Add 'else if' if you add more off states. Thinking about using the other valuse for pwm dimming
+        pinMode(pinsA[n], INPUT);
+      }
+      
+    } else if(v==1){
+      pinMode(pinsA[n], OUTPUT);
+      digitalWrite(pinsA[n], relayOnVal[n]);
+    }
     MqttPushRelayState(n);
+    #ifdef _term_v
     Serial.print( F("Turn light ") );
-    Serial.print(n - 1);
+    Serial.print(n+1);
     if (v == 0){
       Serial.println( F(" off") );
     }else if (v == 1){
       Serial.println(" on");
     }
+    #endif
   }
 }
 

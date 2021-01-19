@@ -25,6 +25,9 @@
 #include "html.h"
 #include "relays.h"
 #include "mqtt.h"
+#include <avr/wdt.h>
+
+#define _term_v// serial terminal feadback
 
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
@@ -73,9 +76,10 @@ void setup() {
   Serial.println(id);
   ip[3] += id;
   mac[5] += id;
-
+  wdt_enable(WDTO_8S);
   // MQTT setup.
   MQTT_setup ();
+  wdt_reset();
   // Open serial communications and wait for port to open:
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
@@ -88,10 +92,11 @@ void setup() {
     delay(10);
     digitalWrite(W5500_RESET_PIN, HIGH);
     delay(2*1000);
-
+  wdt_reset();
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip, dns, gateway,subnet);
 
+  wdt_reset();
   // Check for Ethernet hardware present
   if (Ethernet.hardwareStatus() == EthernetNoHardware) {
     Serial.println(F("Ethernet shield was not found.  Sorry, can't run without hardware. :(") );
@@ -141,6 +146,7 @@ void setup() {
 
 
 void loop() {
+  wdt_reset();
   //byte i;
 
 //Check for MQTT messages.
@@ -155,6 +161,7 @@ void loop() {
   
   EthernetClient client = server.available();
   if (client) {
+    wdt_reset();
     Serial.println("new client");
     found_GET = false;
     lineS[0] = 0;
@@ -172,9 +179,9 @@ void loop() {
         if (c == '\n' && currentLineIsBlank) {
           // send a standard http response header
           html_head(client);
-    if(found_GET){
-      parseString();
-    }
+          if(found_GET){
+            parseString();
+          }
 
           html_buttons(client);
           // out put relay state to html
@@ -190,6 +197,7 @@ void loop() {
         }
       }
     }
+    wdt_reset();
     // give the web browser time to receive the data
     delay(1);
     // close the connection:

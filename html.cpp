@@ -74,14 +74,14 @@ void parseString(){// works with the globle lineS defined in the main ino unit
     DelToC(lineS, '/');
     SplitK1_(lineS, k1, web_page);
   } else {web_page[0] = 0; }
-// prosess any switch commands passed with get syintax
+// process any switch commands passed with get syntax
   if(FindFirstC(lineS, '?') > 0){
     DelToC(lineS, '?');
       //i = 
     while (FindFirstC(lineS, '=') > 0){
       SplitC2_(lineS, '=' , keyS);
       SplitK2_(lineS, (char*)"\2& ", vS );
-// check if keyS is of l?? format where ? can are digets. can be only 1 diget
+// check if keyS is of l?? format where ? can are digits. can be only 1 digit
       if(keyS[0] >= 2){//could be 0 terminated string etc so maybe longer but only care about the first 3
         if(keyS[1] == 'l'){
           if( (keyS[2] >= '0') and (keyS[2] <= '9') ){
@@ -115,7 +115,7 @@ void LookForGet(char s[], char c){
       Serial.print("'");
       if (InStringS(s, _getH) > 0 ){
         found_GET = true;
-      } else {// if the text line has no keyword then set the string to lenght 0;
+      } else {// if the text line has no keyword then set the string to length 0;
         s[0] = 0;
       }
       
