@@ -18,7 +18,6 @@
  */
 
 #include <SPI.h>
-#include <EEPROM.h>
 #include <Ethernet.h>
 #include <PubSubClient.h>
 #include "pString.h"
@@ -26,8 +25,7 @@
 #include "relays.h"
 #include "mqtt.h"
 #include <avr/wdt.h>
-
-#define _term_v// serial terminal feadback
+#include "s.h"
 
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
@@ -45,9 +43,6 @@ IPAddress subnet(255, 255, 240, 0);
 // (port 80 is default for HTTP):
 EthernetServer server(80);
 
-#define NextBoardId 2
-#define eepromIdAddr 250
-#define W5500_RESET_PIN 9
 
 //#define output1 3
 
@@ -56,92 +51,45 @@ EthernetServer server(80);
 void setup() {
   byte id, i;
   Serial.begin(9600);
-  // You can use Ethernet.init(pin) to configure the CS pin
-  //Ethernet.init(10);  // Most Arduino shields
-  //Ethernet.init(5);   // MKR ETH shield
-  //Ethernet.init(0);   // Teensy 2.0
-  //Ethernet.init(20);  // Teensy++ 2.0
-  //Ethernet.init(15);  // ESP8266 with Adafruit Featherwing Ethernet
-  //Ethernet.init(33);  // ESP32 with Adafruit Featherwing Ethernet
-  id = EEPROM.read(eepromIdAddr);
-  //id=0xFF; hard set of board id  
-  if(id == 0xFF){
-    Serial.print(F("Setting") );
-    EEPROM.update(eepromIdAddr, NextBoardId);
-    id = NextBoardId;
-  } else {
-    Serial.print(F("Got") );
-  }
-  Serial.print(F(" EEprom board ID:") );
-  Serial.println(id);
-  ip[3] += id;
-  mac[5] += id;
-  wdt_enable(WDTO_8S);
-  // MQTT setup.
-  MQTT_setup ();
-  wdt_reset();
-  // Open serial communications and wait for port to open:
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
-  Serial.println("Ethernet WebServer Example");
+  Serial.println();
+  Serial.println(F("Serial connected") );
+  IP_offsetSetup();
+  wdt_enable(WDTO_8S);
+  // MQTT setup.
+  //Serial.println(F("Call MQTT_setup") );
+  MQTT_setup ();
+  //Serial.println(F("returned MQTT_setup") );
+  wdt_reset();
+  // Open serial communications and wait for port to open:
+  //Serial.println("Ethernet WebServer Example");
 
-// can be a problem to leave reset floting?
-    pinMode(W5500_RESET_PIN, OUTPUT);
-    digitalWrite(W5500_RESET_PIN, LOW);
-    delay(10);
-    digitalWrite(W5500_RESET_PIN, HIGH);
-    delay(2*1000);
+// can be a problem to leave internet module reset line floting?
+  resetW5500(); //so reset it it as it can also need a reset with power fail to module.
   wdt_reset();
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip, dns, gateway,subnet);
 
   wdt_reset();
   // Check for Ethernet hardware present
-  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
-    Serial.println(F("Ethernet shield was not found.  Sorry, can't run without hardware. :(") );
-    while (true) {
-      delay(1); // do nothing, no point running without Ethernet hardware
-    }
-  }
-  if (Ethernet.linkStatus() == LinkOFF) {
-    Serial.println(F("Ethernet cable is not connected.") );
-  }
-
-  // start the server
-  server.begin();
-  Serial.print(F("server is at ") );
-  Serial.println(Ethernet.localIP());
-  byte macBuffer[6];  // create a buffer to hold the MAC address
-  Ethernet.MACAddress(macBuffer); // fill the buffer
-  Serial.print("The MAC address is: ");
-  for (byte octet = 0; octet < 6; octet++) {
-    Serial.print(macBuffer[octet], HEX);
-    if (octet < 5) {
-      Serial.print('-');
-    }
-  }
-  Serial.println();
-  Serial.print( F("Relay pins array size = ") );
-  Serial.print(sizeof(pinsA) );
-  Serial.print(" Pins: ");
-  for(i=0; i< sizeof(pinsA); i++){
-    if(i>0) Serial.print(", ");
-    Serial.print(pinsA[i]);
-  }
-  Serial.println();
-  Serial.print("Sizeof _getH = ");
-  Serial.println(sizeof(_getH ));
-  Serial.print("Sizeof 'get ' = ");
-  Serial.println(sizeof("GET "));
-  Serial.print("_getH[0] = '");
-  Serial.print(_getH[0]);
-  Serial.println("'");
-  byte x;
-  Serial.println('0',DEC);
-  pPrintln(_getH);
-  Serial.println();
+  //Serial.println(F("Call checkEthernet") );
+  wdt_reset();
+  checkEthernet();
+  
+  // start the web server (on port 80)
+  //Serial.println(F("Call startWebServer()") );
+  wdt_reset();
+  startWebServer();
+  //Serial.println(F("Call printRelaysInfo();") );
+  wdt_reset();
+  printRelaysInfo();
+  Serial.println( F("++++++++++++++Call SetUpRelays();") );
+  wdt_reset();
+ // wdt_disable();
   SetUpRelays();
+  Serial.println( F("Reached end of main Setup function.\n"));
 }
 
 
@@ -162,7 +110,7 @@ void loop() {
   EthernetClient client = server.available();
   if (client) {
     wdt_reset();
-    Serial.println("new client");
+    Serial.println( F("new client") );
     found_GET = false;
     lineS[0] = 0;
     // an http request ends with a blank line
@@ -203,7 +151,7 @@ void loop() {
     // close the connection:
     client.stop();
     Serial.println(F("client disconnected") );
-    Serial.print("found_GET = ");
+    Serial.print( F("found_GET = "));
       Serial.println(found_GET);
     
   }

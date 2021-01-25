@@ -3,6 +3,8 @@
 #include "pString.h"
 #include "html.h"
 #include "mqtt.h"
+#include "defs.h"
+#include <Arduino.h>
 
 ;
 
@@ -20,6 +22,8 @@ void SetUpRelays(){
 //    pinMode(pinsA[i], OUTPUT);
 //    digitalWrite(pinsA[i], relayOnVal[i] xor 0xFF);
 //    relayState[i] = 0;
+    //Serial.print(F("=========Call SetUpRelays(); i = ") );
+    //Serial.println(i);
     UpdateRelayState(i+1, off); //turn all relays off at startup
   }
 }
@@ -34,7 +38,14 @@ void ToggleRelayState(byte n){// n = 1 for first relay
 void UpdateRelayState(byte n, byte v){// n = 1 for first relay
   //This should be the only function used to turn the relays on/off etc.
   // v = 0 to turn off & 1 to turn on
-  if (n >= no_of_relays){
+#ifdef _debug_relays
+  ;
+  Serial.print( F("UpdateRelayState called with relay = ") );
+  Serial.print(n);
+  Serial.print( F(" and value = ") );
+  Serial.print(v);
+#endif  
+  if (n > no_of_relays){
     Serial.println( F("Trying to switch more relays than we have.") );
     return;
   }
@@ -44,11 +55,7 @@ void UpdateRelayState(byte n, byte v){// n = 1 for first relay
   }
   n--;//as the arrays start at 0 for the first elemet 0 will be relay 1 from here.
 #ifdef _debug_relays
-  Serial.print("v = ");
-  Serial.println( v);
-  Serial.print("output = ");
-  Serial.println( output);
-  Serial.print("pin = ");
+  Serial.print(", pin = ");
   Serial.println(pinsA[n] );
 #endif  
   relayState[n] = v;
@@ -65,7 +72,7 @@ void UpdateRelayState(byte n, byte v){// n = 1 for first relay
       pinMode(pinsA[n], OUTPUT);
       digitalWrite(pinsA[n], relayOnVal[n]);
     }
-    MqttPushRelayState(n);
+    MqttPushRelayState(n+1);//n had 1 subtracted above to work with 0 index arrays so +1 here.
     #ifdef _term_v
     Serial.print( F("Turn light ") );
     Serial.print(n+1);

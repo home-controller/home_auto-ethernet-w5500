@@ -1,6 +1,7 @@
 // pascal type strings.
 // Arrays of char with s[0] being the string length. So max length of 255
 #include "pString.h"
+#include "defs.h"
 //{ the k String is looped through a char at a time }
 // if k or c not found in DelToC etc then do nothing
 //
@@ -168,7 +169,7 @@ byte x;
 }
 
 void SplitK1( char s[], const char k[], char r[], byte rLength){
-//Split at k. Delete's char at k. Return first part in r and del it from a.
+//Split at k. Return first part in r and del it from a.
 byte x;
   x = FindFirstK(s, k);
   Split1(s, x, r, rLength);
@@ -189,6 +190,81 @@ byte x;
   Split2(s, x, r, rLength);
 }
 
+//==========================Joining strings======================
 
+//#define SplitK1_(A,C,R) SplitK1(A, C, R, sizeof(R) - 1 );
+void addC(char s1[], char c, byte rLength){// Max return length is the sizeof the array pointed to by s1 in this case.
+  if(rLength > s1[0]) {
+    s1[0]++;
+    s1[ (s1[0]) ] = c;
+  }
+  if(rLength > s1[0]){
+    s1[s1[0] + 1] = 0;// make the string C style turminnated to if we have space.
+  }
+}
 
+void addS(char s1[], const char s2[], byte rLength){// Max return length is the sizeof the array pointed to by s1 in this case.
+  byte cl, i, l;
+#ifdef _pString_debug
+  Serial.print(F("s1 = ") );
+  pPrintln(s1);
+  Serial.print(F("s2 = ") );
+  pPrintln(s2);
+  Serial.print(F("rLength = ") );
+  Serial.println(rLength);
+#endif
+  if( (s1[0] + s2[0]) > rLength){
+    if( s1[0] >= rLength) { cl=0; }
+    else { cl =  rLength - s1[0]; }
+  } else{
+    cl = s2[0];
+  }
+  l = s1[0];
+  for(i = 1; i <= cl; i++){
+    s1[i+l] = s2[i];
+  }
+  s1[0] += cl;
+  if(rLength > s1[0]){
+    s1[s1[0] + 1] = 0;// make the string C style turminnated to if we have space.
+  }
+#ifdef _pString_debug
+  Serial.print(F("after adding s2, s1 = ") );
+  pPrintln(s1);
+#endif  
+
+}
+
+void JoinS1C(const char* s1, const char* s2, char c, char r[], byte rLength){
+  if(r != s1){
+    r[0] =0;
+    addS(r, s1, rLength);
+  }
+  addC(r, c, rLength);
+  addS(r, s2, rLength);
+}
+
+void JoinS(const char s1[], const char s2[], char r[], byte rLength){
+#ifdef _pString_debug
+  Serial.print(F("Entering JoinS ") );
+  Serial.print(F("s1 = ") );
+  pPrintln(s1);
+  Serial.print(F("s2 = ") );
+  pPrintln(s2);
+  Serial.print(F("rLength = ") );
+  Serial.println(rLength);
+#endif
+  if((r != s1) ){
+    r[0] =0;
+    addS(r, s1, rLength);
+  }
+  addS(r, s2, rLength);
+}
+
+//byte lengthZ(char z[]){ //ops already have 1 above
+//  byte i = 0;
+//  while( (i < 255) and (x[i] != 0) ){
+//    i++;
+//  }
+//  return i;
+//}
 //
