@@ -1,6 +1,7 @@
 #include "mqtt.h"
 #include "pString.h"
 #include "relays.h"
+#include "defs.h"
 
 
 
@@ -11,8 +12,11 @@ const char* mqtt_serverIp = "192.168.11.170";
 
 //const char* rootTopic = "xh1/outside/light/s/e";//h1 for house 1, s = south & e = east
 
-const char* relay1MqttTopic = "\x14h1/outside/light/s/e";//h1 for house 1, s = south & e = east
-const char* relay2MqttTopic = "\x14h1/outside/light/e/s";
+const char* relayMqttTopicBase = "\x11h1/outside/light/";
+const char* relay1MqttTopic = "\3s/e";//h1 for house 1, s = south & e = east
+const char relay2MqttTopic[] = {3,'e','/', 's'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
+#define tempStrMaxLen 30
+char temp_pString[tempStrMaxLen + 1];
 //void initVars(){
 //  relay1MqttTopic[0] = sizeof(relay1MqttTopic) - 2;//-1 for 0 turm and 1 for length at [0]
 //  relay2MqttTopic[0] = sizeof(relay2MqttTopic) - 2;//-1 for 0 turm and 1 for length at [0]
@@ -24,46 +28,76 @@ const char* relay2MqttTopic = "\x14h1/outside/light/e/s";
 
   EthernetClient ethClient;
   PubSubClient mqtt_client(ethClient);
+
+void Publish(const char* s, char* bufz){
+  const char p[7] = "\x6state/";
+#ifdef _mqtt_debug
+  Serial.print( F("Publish called with"));
+  Serial.print( F(" Topic: ") );
+  pPrint(s);
+  Serial.print( F(", bufz: ") );
+  Serial.println( bufz);
+  Serial.print( F("prefix set to: ") ); 
+  pPrintln(p);
+#endif
+  temp_pString[0] = 0;
+  AddS_(temp_pString, p);
+//  Serial.print( F("Set temp_pString to prefix: ") );
+//  pPrintln(temp_pString);
+  AddS_(temp_pString, relayMqttTopicBase);
+//  Serial.print( F("Add topic base: ") );
+//  pPrintln(temp_pString);
+  AddS_(temp_pString, s);
+//#ifdef _mqtt_debug
+  Serial.print( F("MQTT publish. Topic: ") );
+  pPrintln(temp_pString);
+  mqtt_client.publish(temp_pString+1, bufz);
+}
 void MqttPushRelayState(byte r){
-  char buf[] = "s=0";
-  buf[2] = 48 + relayState[r-1];
-  if(r == 1){
-    mqtt_client.publish(relay1MqttTopic+1, buf);    
+  Serial.print( F("MqttPushRelayState called with r = "));
+  Serial.println(r);
+  char bufz[] = "s=0";
+  bufz[2] = 48 + relayState[r-1];
+  if(r == 0){
+    Serial.println("Error: The first relay is 1");
   }
-  if(r == 2){
-    mqtt_client.publish(relay2MqttTopic+1, buf);    
+  else if(r == 1){
+    Publish(relay1MqttTopic, bufz);    
+  }
+  else if(r == 2){
+    Publish(relay2MqttTopic, bufz);    
   }
 #if  no_of_relays >= 3  
   if(r == 3){
-    mqtt_client.publish(relay3MqttTopic+1, buf);    
+    Publish(relay3MqttTopic, bufz);    
   }
 #if  no_of_relays >= 4  
   if(r == 4){
-    mqtt_client.publish(relay4MqttTopic+1, buf);    
+    Publish(relay4MqttTopic, bufz);    
   }
 #if  no_of_relays >= 5  
   if(r == 5){
-    mqtt_client.publish(relay5MqttTopic+1, buf);    
+    Publish(relay5MqttTopic, bufz);    
   }
 #if  no_of_relays >= 6  
   if(r == 6){
-    mqtt_client.publish(relay6MqttTopic+1, buf);    
+    Publish(relay6MqttTopic, bufz);    
   }
 #if  no_of_relays >= 7  
   if(r == 7){
-    mqtt_client.publish(relay7MqttTopic+1, buf);    
+    Publish(relay7MqttTopic, bufz);    
   }
 #if  no_of_relays >= 8  
   if(r == 8){
-    mqtt_client.publish(relay8MqttTopic+1, buf);    
+    Publish(relay8MqttTopic, bufz);    
   }
 #if  no_of_relays >= 9  
   if(r == 9){
-    mqtt_client.publish(relay9MqttTopic+1, buf);    
+    Publish(relay9MqttTopic, bufz);    
   }
 #if  no_of_relays >= 10 
   if(r == 10){
-    mqtt_client.publish(relay10MqttTopic+1, buf);    
+    Publish(relay10MqttTopic, bufz);    
   }
 #endif //no_of_relays >= 3
 #endif //no_of_relays >= 4
@@ -94,20 +128,24 @@ boolean reconnect() {
   }
   // Loop until we're reconnected
   if (!mqtt_client.connected()) {
-    Serial.print("Attempting MQTT connection...");
+    Serial.print( F("Attempting MQTT connection..."));
     // Attempt to connect
     if (mqtt_client.connect("li_o")) {
-      Serial.println("connected");
+      Serial.println( F("connected"));
       // Once connected, publish an announcement...
       mqtt_client.publish("h1/outside/light","connected");
       // ... and resubscribe
-      if(mqtt_client.subscribe((relay1MqttTopic + 1), 1) ) {Serial.println("Subscribed to topic"); }
-      else {Serial.println("failed to subscribed"); }
+      JoinS_(relayMqttTopicBase, "\x1#", temp_pString)
+      if(mqtt_client.subscribe((temp_pString + 1), 1) ) {
+        Serial.println( F("Subscribed to topic: ") ); 
+        pPrintln(temp_pString);
+      }
+      else {Serial.println( F("failed to subscribed") ); }
       
     } else {
-      Serial.print("failed, rc=");
+      Serial.print( F("failed, rc=") );
       Serial.print(mqtt_client.state());
-      Serial.println(" try again in 5 seconds");
+      Serial.println( F(" try again in 5 seconds") );
       // Wait 5 seconds before retrying
 //      delay(5000);
       failDelay = 45;
@@ -116,14 +154,36 @@ boolean reconnect() {
   }
   return true;
 }
-byte GetTopicRelay(char topic[]){
-  if( StrComSZ(relay1MqttTopic, topic) ) { return 1; }
-  if( StrComSZ(relay2MqttTopic, topic) ) { return 2; }
+
+byte GetTopicRelay(char topic[]){// topic is C string of char.
+#ifdef _mqtt_debug
+  Serial.print( F("GetTopicRelay: Topic: ") ); 
+  Serial.print(topic);
+#endif  
+  byte l = StrLenZ(topic);
+  byte i;
+  if(l > relayMqttTopicBase[0]){
+    if( l > 255 - tempStrMaxLen) l = 255 - tempStrMaxLen;
+    if( l > (relayMqttTopicBase[0] + tempStrMaxLen) ) l = relayMqttTopicBase[0] + tempStrMaxLen; 
+    for(i=0; i <= l; i++){//<= to include the trailing 0.
+      temp_pString[i+1] = topic[i+relayMqttTopicBase[0]];
+    }
+    if(l > relayMqttTopicBase[0]){ temp_pString[0] = l - relayMqttTopicBase[0]; }
+    else {temp_pString[0] = 0;}
+    
+  } else temp_pString[0] = 0;
+#ifdef _mqtt_debug
+  Serial.print( F(", Without base: ") ); 
+  pPrintln(temp_pString);
+#endif  
+  if( StrCom(relay1MqttTopic, temp_pString) ) { return 1; }
+  if( StrCom(relay2MqttTopic, temp_pString) ) { return 2; }
   return 0;
 }
+
 void callback(char* topic, byte* payload, unsigned int length) {
 byte i;
-  Serial.print("Message arrived [");
+  Serial.print( F("Message arrived, Topic: [") );
   Serial.print(topic);
   Serial.print("] ");
   for (i=0;i<length;i++) {
@@ -132,7 +192,7 @@ byte i;
   Serial.println();
   i = GetTopicRelay(topic);
   if(length == 1){
-    Serial.println("Payload length  = 1");
+    Serial.println( F("Payload length  = 1"));
     if( (payload[0] == '0') and (i > 0) ){ UpdateRelayState(i, (byte) 0); }
     else if( (payload[0] == '1') and (i > 0) ){ UpdateRelayState(i, (byte) 1); }
     else if( (payload[0] == 't') and (i > 0) ){ ToggleRelayState(i); }

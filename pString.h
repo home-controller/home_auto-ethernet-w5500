@@ -13,6 +13,7 @@ void pPrint(const char s[]);
 void pPrintln(const char s[]);
 
 byte StrLenZ(const char s[]);
+//byte lengthZ(char z[])
 
 //{ the k String is looped through a char at a time }
 byte InStringS(const char s1[], const char s2[], boolean start = true);
@@ -35,6 +36,14 @@ void SplitK2(char a[], const char k[], char r[], byte rLength);
 
 #define SplitK1_(A,C,R) SplitK1(A, C, R, sizeof(R) - 1 );
 void SplitK1( char s[],  const char k[], char r[], byte rLength);
+
+#define AddS_(R,S) addS(R, S, sizeof(R) - 1 );
+void addS(char s1[], const char s2[], byte rLength);
+#define JoinS_(A,C,R) JoinS(A, C, R, sizeof(R) - 1 );
+void JoinS(const char s1[], const char s2[], char r[], byte rLength);
+#define JoinS1C_(S,A,C,R) JoinS1C(S, A, C, R, sizeof(R) - 1 );
+void JoinS1C(const char* s1, const char* s2, char c, char r[], byte rLength);
+
 
 
 ;

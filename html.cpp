@@ -91,9 +91,9 @@ void parseString(){// works with the globle lineS defined in the main ino unit
           }
         }
       }
-      Serial.print("Key found, Key = '");
+      Serial.print( F("Key found, Key = '") );
       pPrint(keyS);
-      Serial.print("' value = '");
+      Serial.print( F("' value = '"));
       pPrint(vS);
       Serial.println("'");
     }
@@ -107,10 +107,10 @@ void LookForGet(char s[], char c){
       //s[0] = ts_i;
       if (s[0] <= t_str_len){ s[s[0]+1] = 0; }
   // search the line for the GET keyword, if found stop looking.
-      Serial.print("s = '");
+      Serial.print( F("s = '"));
       pPrint(s);
       Serial.println("'");
-      Serial.print("_getH = '");
+      Serial.print( F("_getH = '") );
       pPrintln(_getH);
       Serial.print("'");
       if (InStringS(s, _getH) > 0 ){
