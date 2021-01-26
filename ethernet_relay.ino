@@ -1,19 +1,17 @@
 /*
-  Web Server
+  Web Server / MQTT client to control relays.
 
- A simple web server that shows the value of the analog input pins.
+ A simple web server + MQTT that conntrols relays with the web page or with MQTT.
  using an Arduino Wiznet Ethernet shield.
 
- Circuit:
- * Ethernet shield attached to pins 10, 11, 12, 13
- * Analog inputs attached to pins A0 through A5 (optional)
+ The web server is there so you can still ture the lights on and off from any web
+ browser if the MQTT server is down for any reson.
 
- created 18 Dec 2009
- by David A. Mellis
- modified 9 Apr 2012
- by Tom Igoe
- modified 02 Sept 2015
- by Arturo Guadalupi
+ Circuit:
+ * Ethernet shield attached with SPI to pins 10, 11, 12, 13 + 9 for reset
+ * Output for relays on pins 3, 4 See relays.h tab
+Created to start with by copying from The examples of the libraries used.
+Joseph
  
  */
 
