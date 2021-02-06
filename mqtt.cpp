@@ -12,9 +12,17 @@ const char* mqtt_serverIp = "192.168.11.170";
 
 //const char* rootTopic = "xh1/outside/light/s/e";//h1 for house 1, s = south & e = east
 
-const char* relayMqttTopicBase = "\x11h1/outside/light/";
-const char* relay1MqttTopic = "\3s/e";//h1 for house 1, s = south & e = east
-const char relay2MqttTopic[] = {3,'e','/', 's'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
+const char* relayMqttTopicBase = "\6h1/c1/";
+const char* relay1MqttTopic = "\13outside/s/e";//h1 for house 1, s = south & e = east
+const char relay2MqttTopic[] = {11,'o','u','t','s','i','d','e','/','s','/', 'w'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
+const char relay3MqttTopic[] = {11,'o','u','t','s','i','d','e','/','e','/', 's'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
+
+const char relay4MqttTopic[] = {7,'f','2','/','h','a','l','l'} ;
+const char relay5MqttTopic[] = {9,'f','2','/','o','f','f','i','c','e'} ;
+const char relay6MqttTopic[] = {9,'f','2','/','j','u','n','k','/','e'} ;
+const char relay7MqttTopic[] = {10,'f','2','/','j','u','n','k','/','e','2'} ;
+const char relay8MqttTopic[] = {9,'f','2','/','j','u','n','k','/','w'} ;
+
 #define tempStrMaxLen 30
 char temp_pString[tempStrMaxLen + 1];
 //void initVars(){
@@ -30,7 +38,7 @@ char temp_pString[tempStrMaxLen + 1];
   PubSubClient mqtt_client(ethClient);
 
 void Publish(const char* s, char* bufz){
-  const char p[7] = "\x6state/";
+  const char p[8] = "\x6state/";
 #ifdef _mqtt_debug
   Serial.print( F("Publish called with"));
   Serial.print( F(" Topic: ") );
@@ -161,7 +169,7 @@ byte GetTopicRelay(char topic[]){// topic is C string of char.
   Serial.print(topic);
 #endif  
   byte l = StrLenZ(topic);
-  byte i;
+  byte r, i;
   if(l > relayMqttTopicBase[0]){
     if( l > 255 - tempStrMaxLen) l = 255 - tempStrMaxLen;
     if( l > (relayMqttTopicBase[0] + tempStrMaxLen) ) l = relayMqttTopicBase[0] + tempStrMaxLen; 
@@ -175,9 +183,45 @@ byte GetTopicRelay(char topic[]){// topic is C string of char.
 #ifdef _mqtt_debug
   Serial.print( F(", Without base: ") ); 
   pPrintln(temp_pString);
-#endif  
-  if( StrCom(relay1MqttTopic, temp_pString) ) { return 1; }
-  if( StrCom(relay2MqttTopic, temp_pString) ) { return 2; }
+#endif
+  r = 1; 
+  #define _check_relay(I)  { if( StrCom(relay ## I ## MqttTopic, temp_pString) ) { return I; } } 
+  _check_relay(1);
+  _check_relay(2);
+  //if( StrCom(relay1MqttTopic, temp_pString) ) { return 1; }
+  //if( StrCom(relay2MqttTopic, temp_pString) ) { return 2; }
+#if  no_of_relays >= 3  
+  _check_relay(3);
+//  if( StrCom(relay3MqttTopic, temp_pString) ) { return 3; }
+#if  no_of_relays >= 4  
+  _check_relay(4);
+  //if( StrCom(relay4MqttTopic, temp_pString) ) { return 4; }
+#if  no_of_relays >= 5  
+  _check_relay(5);
+  //if( StrCom(relay5MqttTopic, temp_pString) ) { return 5; }
+#if  no_of_relays >= 6  
+  _check_relay(6);
+  //if( StrCom(relay6MqttTopic, temp_pString) ) { return 6; }
+#if  no_of_relays >= 7  
+  _check_relay(7);
+  //if( StrCom(relay7MqttTopic, temp_pString) ) { return 6; }
+#if  no_of_relays >= 8  
+  _check_relay(8);
+  //if( StrCom(relay8MqttTopic, temp_pString) ) { return 2; }
+#if  no_of_relays >= 9  
+  _check_relay(9);
+  //if( StrCom(relay9MqttTopic, temp_pString) ) { return 2; }
+#if  no_of_relays >= 10 
+  _check_relay(10);
+  //if( StrCom(relay10MqttTopic, temp_pString) ) { return 2; }
+#endif  // relay 3
+#endif  // relay 4
+#endif  // relay 5
+#endif  // relay 6
+#endif  // relay 7
+#endif  // relay 8
+#endif  // relay 9
+#endif  // relay 10
   return 0;
 }
 
@@ -191,6 +235,10 @@ byte i;
   }
   Serial.println();
   i = GetTopicRelay(topic);
+  Serial.print( F("Topic matched relay: ") );
+  Serial.print(i);
+  Serial.print(", ");
+
   if(length == 1){
     Serial.println( F("Payload length  = 1"));
     if( (payload[0] == '0') and (i > 0) ){ UpdateRelayState(i, (byte) 0); }
