@@ -81,7 +81,7 @@ boolean StrCom(const char s1[], const char s2[]){// True if the string array hav
 boolean StrComSZ(const char s1[], const char z1[] ){
   byte i, l;
   l = StrLenZ(z1);
-  if (l != s1[i]) return false;
+  if (l != s1[0]) return false;
   for(i=1;i<=s1[0]; i++){
     if((s1[i] != z1[i-1]) ) {return false; }
   }
@@ -196,7 +196,7 @@ byte x;
 void addC(char s1[], char c, byte rLength){// Max return length is the sizeof the array pointed to by s1 in this case.
   if(rLength > s1[0]) {
     s1[0]++;
-    s1[ (s1[0]) ] = c;
+    s1[ (byte) (s1[0]) ] = c;
   }
   if(rLength > s1[0]){
     s1[s1[0] + 1] = 0;// make the string C style turminnated to if we have space.

@@ -169,7 +169,7 @@ byte GetTopicRelay(char topic[]){// topic is C string of char.
   Serial.print(topic);
 #endif  
   byte l = StrLenZ(topic);
-  byte r, i;
+  byte i;
   if(l > relayMqttTopicBase[0]){
     if( l > 255 - tempStrMaxLen) l = 255 - tempStrMaxLen;
     if( l > (relayMqttTopicBase[0] + tempStrMaxLen) ) l = relayMqttTopicBase[0] + tempStrMaxLen; 
@@ -184,7 +184,7 @@ byte GetTopicRelay(char topic[]){// topic is C string of char.
   Serial.print( F(", Without base: ") ); 
   pPrintln(temp_pString);
 #endif
-  r = 1; 
+
   #define _check_relay(I)  { if( StrCom(relay ## I ## MqttTopic, temp_pString) ) { return I; } } 
   _check_relay(1);
   _check_relay(2);
