@@ -1,5 +1,1 @@
-// serial terminal feadback & debug. Needs to be before #includes to work with that file.
-#define _term_v
-//#define _debug_relays
-//#define _mqtt_debug
-//#define _pString_debug
+/home/jmnc2/Documents/programming/Arduino/home_auto/ethernet_relay/defs.h
