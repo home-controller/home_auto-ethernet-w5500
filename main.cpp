@@ -18,6 +18,7 @@ Joseph
 #include <SPI.h>
 #include <Ethernet.h>
 #include <PubSubClient.h>
+#include "defs.h"
 #include "pString.h"
 #include "html.h"
 #include "relays.h"
@@ -54,7 +55,17 @@ void setup() {
   }
   Serial.println();
   Serial.println(F("Serial connected") );
+  Serial.print(F("Board type: ") );
+  Serial.print( eth_type );
+  if (arduino_type == Uno_board) {Serial.print(" Uno "); }
+  else if (arduino_type == Nano_board) {Serial.print(" Nano, "); }
+  if (eth_chip == _W5100){ Serial.println("W5100"); }
+  else if (eth_chip == _W5500){ Serial.println("W5500"); }
+  else {Serial.println();}
+  
+  
   IP_offsetSetup();
+  initMqttVars();// Setup mqtt base unit name id and converts pascal type string. the 01 part of: char relayMqttTopicBase[] = "h1/c01/";
   wdt_enable(WDTO_8S);
   // MQTT setup.
   //Serial.println(F("Call MQTT_setup") );
@@ -65,7 +76,7 @@ void setup() {
   //Serial.println("Ethernet WebServer Example");
 
 // can be a problem to leave internet module reset line floting?
-  resetW5500(); //so reset it it as it can also need a reset with power fail to module.
+  resetW5500(); //so reset it as it can also need a reset with power fail to module.
   wdt_reset();
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip, dns, gateway,subnet);
@@ -145,7 +156,7 @@ void loop() {
     }
     wdt_reset();
     // give the web browser time to receive the data
-    delay(1);
+    delay(10);
     // close the connection:
     client.stop();
     Serial.println(F("client disconnected") );

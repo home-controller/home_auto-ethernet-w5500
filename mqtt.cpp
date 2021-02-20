@@ -12,12 +12,15 @@ const char* mqtt_serverIp = "192.168.11.170";
 
 //const char* rootTopic = "xh1/outside/light/s/e";//h1 for house 1, s = south & e = east
 
-const char* relayMqttTopicBase = "\6h1/c1/";
+#define _str_join(B, C)
+
+char relayMqttTopicBase[] = "h1/c01/";
+
 const char* relay1MqttTopic = "\13outside/s/e";//h1 for house 1, s = south & e = east
 const char relay2MqttTopic[] = {11,'o','u','t','s','i','d','e','/','e','/', 's'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
 const char relay3MqttTopic[] = {11,'o','u','t','s','i','d','e','/','s','/', 'w'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
 
-const char relay4MqttTopic[] = {7,'f','2','/','h','a','l','l'} ;
+const char relay4MqttTopic[] = {7,'f','2','/','h','a','l','l'} ;// "f2/hall"
 const char relay5MqttTopic[] = {9,'f','2','/','o','f','f','i','c','e'} ;
 const char relay6MqttTopic[] = {9,'f','2','/','j','u','n','k','/','e'} ;
 const char relay7MqttTopic[] = {10,'f','2','/','j','u','n','k','/','e','2'} ;
@@ -130,7 +133,7 @@ void MQTT_setup(){
 boolean reconnect() {
   static byte failDelay = 0;
   if(failDelay > 0){
-    delay(100);
+    delay(100);// tenth of a second
     failDelay--;
     return false;
   }
@@ -153,10 +156,10 @@ boolean reconnect() {
     } else {
       Serial.print( F("failed, rc=") );
       Serial.print(mqtt_client.state());
-      Serial.println( F(" try again in 5 seconds") );
+      Serial.println( F(" try again in 20 seconds") );
       // Wait 5 seconds before retrying
 //      delay(5000);
-      failDelay = 45;
+      failDelay = 190;//delay for 19 seconds as other stuf each loop may take smoe time.
       return false;
     }
   }

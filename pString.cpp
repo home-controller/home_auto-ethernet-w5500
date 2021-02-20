@@ -21,6 +21,19 @@ byte StrLenZ(const char z[]){
   return 0xFF; //string is longer than can be returned in a byte or no 0 termination for the string.
 }
 
+void cTo_pString(char s[], byte l){
+  byte x;
+  for(x=l;x>0;x--){
+    s[x] = s[x-1];
+  }
+  s[0] = l;
+}
+
+void cTo_pString(char s[]){
+  byte l = StrLenZ(s);
+  cTo_pString(s, l);
+}
+
 void pPrint(const char s[]){
   byte i;
   byte ln = s[0];
