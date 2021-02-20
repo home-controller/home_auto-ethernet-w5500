@@ -6,6 +6,7 @@
 
 extern EthernetClient ethClient;
 extern PubSubClient mqtt_client;
+extern char relayMqttTopicBase[];// = "h1/c01/";
 
 extern byte mac[];
 

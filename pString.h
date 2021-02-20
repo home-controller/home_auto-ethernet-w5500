@@ -12,7 +12,12 @@
 void pPrint(const char s[]);
 void pPrintln(const char s[]);
 
-byte StrLenZ(const char s[]);
+byte StrLenZ(const char s[] );
+;
+#define cTo_pString_( A ) cTo_pString(A, sizeof(A) - 1 );
+;
+void cTo_pString(char s[], byte l);
+void cTo_pString(char s[]);
 //byte lengthZ(char z[])
 
 //{ the k String is looped through a char at a time }

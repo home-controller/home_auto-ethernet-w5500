@@ -2,6 +2,10 @@
 #include "s.h"
 #include <EEPROM.h>
 #include "relays.h"
+#include "mqtt.h"
+#include "pString.h"
+
+byte unit_id;
 
 void resetW5500(){
     pinMode(W5500_RESET_PIN, OUTPUT);
@@ -34,8 +38,16 @@ byte IP_offsetSetup(){
   Serial.println(id);
   ip[3] += id;
   mac[5] += id;
+  unit_id = id;
   return id;
 }
+
+void initMqttVars(){
+  cTo_pString( relayMqttTopicBase );
+  if(unit_id > 9) {relayMqttTopicBase[5] = (unit_id / 10) + '0'; }
+  relayMqttTopicBase[6] = (unit_id % 10) + '0';
+}
+
 
 void printRelaysInfo(){
   byte i;
