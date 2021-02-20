@@ -14,8 +14,8 @@ const char* mqtt_serverIp = "192.168.11.170";
 
 const char* relayMqttTopicBase = "\6h1/c1/";
 const char* relay1MqttTopic = "\13outside/s/e";//h1 for house 1, s = south & e = east
-const char relay2MqttTopic[] = {11,'o','u','t','s','i','d','e','/','s','/', 'w'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
-const char relay3MqttTopic[] = {11,'o','u','t','s','i','d','e','/','e','/', 's'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
+const char relay2MqttTopic[] = {11,'o','u','t','s','i','d','e','/','e','/', 's'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
+const char relay3MqttTopic[] = {11,'o','u','t','s','i','d','e','/','s','/', 'w'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
 
 const char relay4MqttTopic[] = {7,'f','2','/','h','a','l','l'} ;
 const char relay5MqttTopic[] = {9,'f','2','/','o','f','f','i','c','e'} ;
