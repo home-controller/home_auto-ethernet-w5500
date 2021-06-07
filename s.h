@@ -1,10 +1,13 @@
 #ifndef _s_h
 #define _s_h
-
+/*
+ * Stuff called on statup to.
+ * Moved hear to clear up main.cpp
+ */
 #include <Arduino.h>
 #include <Ethernet.h>
 
-#define W5500_RESET_PIN 9
+#define W5500_RESET_PIN 9 //if changed update comments in defs.h
 
 #define NextBoardId 3
 #define eepromIdAddr 250
@@ -15,15 +18,18 @@ extern IPAddress gateway;//(192, 168, 11, 1);
 extern IPAddress subnet;//(255, 255, 240, 0);
 extern EthernetServer server;//(80);
 extern byte unit_id;
+extern boolean EthernetConected;
 
 extern byte mac[];
 
 void initMqttVars();
 void resetW5500();
-void checkEthernet();
+boolean checkEthernet();
 void startWebServer();
 void printRelaysInfo();
 byte IP_offsetSetup();
+void ConnectEthernet();
+boolean testEthernet();
 
 
 

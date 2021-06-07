@@ -3,10 +3,10 @@
 
 #include <Arduino.h>
 
-
-#define no_of_relays 8
-#define initHLa ={LOW,LOW,LOW,LOW,HIGH,HIGH,HIGH,HIGH}// the value to use to turn the relay etc. on. e.g. 0 for most relay modules, as they are pull low to turn on.
-#define relayPins 3,4,5,6,A0,A1,A2,A3
+// moved to defs.h
+#define no_of_relays 9
+#define initHLa ={LOW,LOW,LOW,LOW,HIGH,HIGH,HIGH,HIGH,HIGH}// the value to use to turn the relay etc. on. e.g. 0 for most relay modules, as they are pull low to turn on.
+#define relayPins 3,5,6,7,8,A0,A1,A2,A3 //if changed update defs.h
 #define defaultOffV 2 //2 is for set pin to input mode to turn off.
 ;
 extern byte pinsA[no_of_relays];

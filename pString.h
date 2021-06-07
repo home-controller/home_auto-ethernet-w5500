@@ -9,6 +9,13 @@
 
 //#define "\4GET "
 ;
+struct pStr {
+      char p[1];
+      char c[];
+};
+
+#define pStr_(S) {sizeof(S)-1, S} ;
+
 void pPrint(const char s[]);
 void pPrintln(const char s[]);
 
@@ -27,6 +34,8 @@ boolean StrComSZ(const char s1[], const char z1[] );
 byte FindFirstC(const char s[], const char c);
 byte FindFirstK(const char s[], const char k[]);
 
+#define CopyFirst_(A,N,R) CopyFirst(A, N, R, sizeof(R) - 1 );
+void CopyFirst(const char a[], byte n, char r[], byte rLength);
 
 void DelFirst(char s[], byte n);
 void DelToC(char s[], byte c);

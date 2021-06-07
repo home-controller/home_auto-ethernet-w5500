@@ -42,11 +42,28 @@
 #ifdef _Uno
   #define eth_board_type  t_Ethershield
   #define eth_chip _W5100
-#elif _Nano
+#elif defined(_Nano)
   #define eth_board_type t_Module
   #define eth_chip _W5500
 #endif 
 #define eth_type (eth_board_type + eth_chip)
+
+// Pins used;
+// 0, 1 for USB
+// 14, 15 used for clock crystal
+// 3,5,6,7,8,A0,A1,A2,A3 defined in relays.h
+// 4 sd card select. maybe only shield, but might want card or eeprom module or others
+
+// 9 for ethernet module reset. defined in s.h
+// 10 eth select
+// 11, 12, and 13 for SPI
+// A4, A5 likley need for I2C at some point.
+
+// A6,A7 Wall switch input
+// D2 home net pin. As a plus this is one of the 2 int on pin change pins. The rest you int on a group with bitmasks etc. So use this to start with anyway.
+
+//how sad, 1 pin short for 10 relays. Will have to use shift reg IC at some point I guess.
+
 
 /*
 

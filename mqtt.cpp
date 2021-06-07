@@ -14,17 +14,20 @@ const char* mqtt_serverIp = "192.168.11.170";
 
 #define _str_join(B, C)
 
-char relayMqttTopicBase[] = "h1/c01/";
+char relayMqttTopicBase[] = "h1/c01/";//converted to pas string in s.cpp
 
-const char* relay1MqttTopic = "\13outside/s/e";//h1 for house 1, s = south & e = east
-const char relay2MqttTopic[] = {11,'o','u','t','s','i','d','e','/','e','/', 's'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
-const char relay3MqttTopic[] = {11,'o','u','t','s','i','d','e','/','s','/', 'w'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
+const char* relay1MqttTopic = "\13outside/s/e";//h1 for house 1, s = south & e = east i.e. over rachels room
+const char relay2MqttTopic[] = {11,'o','u','t','s','i','d','e','/','e','/', 's'} ;// "\x03e" = 1 char = to 0x3E apparently ;( over my room
+const char relay3MqttTopic[] = {11,'o','u','t','s','i','d','e','/','s','/', 'w'} ;// "\x03e" = 1 char = to 0x3E apparently ;( tool room
 
-const char relay4MqttTopic[] = {7,'f','2','/','h','a','l','l'} ;// "f2/hall"
+pStr relay4MqttTopic = pStr_("f2/hall") ;// "f2/hall"
 const char relay5MqttTopic[] = {9,'f','2','/','o','f','f','i','c','e'} ;
 const char relay6MqttTopic[] = {9,'f','2','/','j','u','n','k','/','e'} ;
 const char relay7MqttTopic[] = {10,'f','2','/','j','u','n','k','/','e','2'} ;
 const char relay8MqttTopic[] = {9,'f','2','/','j','u','n','k','/','w'} ;
+////{9,'f','2','/','j','u','n','k','/','w'} ;
+//relay9MqttTopic[0]= (char) sizeof(relay9MqttTopic)-1;//don't count trailing 0
+pStr relay9MqttTopic = pStr_("f2/stairs");
 
 #define tempStrMaxLen 30
 char temp_pString[tempStrMaxLen + 1];
@@ -62,7 +65,7 @@ void Publish(const char* s, char* bufz){
 //#ifdef _mqtt_debug
   Serial.print( F("MQTT publish. Topic: ") );
   pPrintln(temp_pString);
-  mqtt_client.publish(temp_pString+1, bufz);
+  if (mqtt_client.connected() ) mqtt_client.publish(temp_pString+1, bufz);
 }
 void MqttPushRelayState(byte r){
   Serial.print( F("MqttPushRelayState called with r = "));
@@ -84,7 +87,7 @@ void MqttPushRelayState(byte r){
   }
 #if  no_of_relays >= 4  
   if(r == 4){
-    Publish(relay4MqttTopic, bufz);    
+    Publish(relay4MqttTopic.p, bufz);    
   }
 #if  no_of_relays >= 5  
   if(r == 5){
@@ -104,7 +107,7 @@ void MqttPushRelayState(byte r){
   }
 #if  no_of_relays >= 9  
   if(r == 9){
-    Publish(relay9MqttTopic, bufz);    
+    Publish(relay9MqttTopic.p, bufz);    
   }
 #if  no_of_relays >= 10 
   if(r == 10){
@@ -144,7 +147,9 @@ boolean reconnect() {
     if (mqtt_client.connect("li_o")) {
       Serial.println( F("connected"));
       // Once connected, publish an announcement...
-      mqtt_client.publish("h1/outside/light","connected");
+      CopyFirst_(relayMqttTopicBase, relayMqttTopicBase[0]-1, temp_pString);
+      
+      mqtt_client.publish(temp_pString+1,"connected");
       // ... and resubscribe
       JoinS_(relayMqttTopicBase, "\x1#", temp_pString)
       if(mqtt_client.subscribe((temp_pString + 1), 1) ) {
@@ -189,6 +194,7 @@ byte GetTopicRelay(char topic[]){// topic is C string of char.
 #endif
 
   #define _check_relay(I)  { if( StrCom(relay ## I ## MqttTopic, temp_pString) ) { return I; } } 
+  #define _check_relayP(I)  { if( StrCom(relay ## I ## MqttTopic.p, temp_pString) ) { return I; } } 
   _check_relay(1);
   _check_relay(2);
   //if( StrCom(relay1MqttTopic, temp_pString) ) { return 1; }
@@ -197,7 +203,7 @@ byte GetTopicRelay(char topic[]){// topic is C string of char.
   _check_relay(3);
 //  if( StrCom(relay3MqttTopic, temp_pString) ) { return 3; }
 #if  no_of_relays >= 4  
-  _check_relay(4);
+  _check_relayP(4);
   //if( StrCom(relay4MqttTopic, temp_pString) ) { return 4; }
 #if  no_of_relays >= 5  
   _check_relay(5);
@@ -212,7 +218,7 @@ byte GetTopicRelay(char topic[]){// topic is C string of char.
   _check_relay(8);
   //if( StrCom(relay8MqttTopic, temp_pString) ) { return 2; }
 #if  no_of_relays >= 9  
-  _check_relay(9);
+  _check_relayP(9);
   //if( StrCom(relay9MqttTopic, temp_pString) ) { return 2; }
 #if  no_of_relays >= 10 
   _check_relay(10);

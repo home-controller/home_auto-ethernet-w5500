@@ -4,8 +4,11 @@
 #include "relays.h"
 #include "mqtt.h"
 #include "pString.h"
+#include <avr/wdt.h>
 
 byte unit_id;
+
+boolean EthernetConected = false;
 
 void resetW5500(){
     pinMode(W5500_RESET_PIN, OUTPUT);
@@ -77,15 +80,63 @@ void startWebServer(){
   Serial.println();
 }
 
-void checkEthernet(){
-  // Check for Ethernet hardware present
-  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
-    Serial.println(F("Ethernet shield was not found.  Sorry, can't run without hardware. :(") );
-    while (true) {
-      delay(1); // do nothing, no point running without Ethernet hardware
+boolean testEthernet(){
+static unsigned long EthlastTestMils = millis();
+const unsigned long millsD = (unsigned long)2 * 60 * 1000;// should be 2 minutes
+  unsigned long t;
+  unsigned long t2;
+  t = millis();
+  t2 = t - EthlastTestMils;
+#ifdef _debugTimings
+  Serial.print(F("2 minutes in mills: ") );
+  Serial.println(millsD);
+  Serial.print(F("now        : ") );
+  Serial.println(t);
+  Serial.print(F("saved      : ") );
+  Serial.println(EthlastTestMils);
+  Serial.print(F("now - saved: ") );
+  Serial.println(t2);
+  delay(1000);
+#endif
+  if( t2 > millsD){// 2 minutes
+    //EthlastTestMils = millis();
+    if(!checkEthernet() ){
+      ConnectEthernet();
     }
+    EthlastTestMils =t;
   }
-  if (Ethernet.linkStatus() == LinkOFF) {
-    Serial.println(F("Ethernet cable is not connected.") );
+}
+
+boolean checkEthernet(){
+  // Check for Ethernet hardware present
+  EthernetConected = false;
+  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+    Serial.println(F("Ethernet shield was not found.") );  //Sorry, can't run without hardware. :(
+  } else {
+    if (Ethernet.linkStatus() == LinkOFF) {
+      Serial.println(F("Ethernet cable is not connected.") );
+    }
+    else EthernetConected = true;
+  }
+  return EthernetConected;
+}
+
+void ConnectEthernet(){
+  // can be a problem to leave internet module reset line floting?
+  resetW5500(); //so reset it as it can also need a reset with power fail to module.
+  delay(500);
+  wdt_reset();
+  // start the Ethernet connection and the server:
+  Ethernet.begin(mac, ip, dns, gateway,subnet);
+
+  //wdt_reset();
+  // Check for Ethernet hardware present
+  //Serial.println(F("Call checkEthernet") );
+  wdt_reset();
+  if (checkEthernet() ){//check for ethernet hardware e.g shield & cable conectted
+    // start the web server (on port 80)
+    //Serial.println(F("Call startWebServer()") );
+    wdt_reset();
+    startWebServer();
   }
 }

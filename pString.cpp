@@ -13,6 +13,28 @@
 //   int m;
 //} v1;
 
+//struct pStr {
+//  union{
+//    struct {
+//      byte l;
+//      char p[];
+//    };
+//    struct {
+//      char c[];
+////      byte z;
+//    };
+////    char [];
+//  };
+//};
+//
+//pStr test = {4, "test"};
+
+//class pString{
+//  char s[1];
+//  char c[];
+//  
+//};
+
 byte StrLenZ(const char z[]){
   byte i;
   for(i=0; i< 0xFF; i++){
@@ -56,7 +78,7 @@ void pPrintln(const char s[]){
   Serial.println();
 }
 //+++++++++++++++Copying parts of the string+++++++
-void CopyFirst(char a[], byte n, char r[], byte rLength){
+void CopyFirst(const char a[], byte n, char r[], byte rLength){
   byte i;
   if(n>rLength){ n = rLength; }
   if(n>a[0]){ n = a[0]; }
@@ -64,6 +86,7 @@ void CopyFirst(char a[], byte n, char r[], byte rLength){
     r[i] = a[i];
   }
   r[0] = n;
+  if(n<rLength){r[n+1] = 0; }
 }
 
 
