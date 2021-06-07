@@ -162,6 +162,5 @@ void loop() {
     Serial.println(F("client disconnected") );
     Serial.print( F("found_GET = "));
       Serial.println(found_GET);
-    
   }
 }
