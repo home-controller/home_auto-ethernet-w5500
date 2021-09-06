@@ -13,12 +13,53 @@
 //   int m;
 //} v1;
 
+/**
+ * TODO add test.
+ * @brief Return the length of a Zero tuminated byte array, not counting the 0.
+ * Otherwize know as a c string.
+ * 
+ * @param[in] z
+ *      Pointer to a byte array.
+ * 
+ * @return    byte
+ *    String length.
+ */
 byte StrLenZ(const char z[]){
   byte i;
   for(i=0; i< 0xFF; i++){
     if(z[i] == 0){ return i; }
   }
   return 0xFF; //string is longer than can be returned in a byte or no 0 termination for the string.
+}
+
+// n is the number to convert.
+// s is the array to return the string in.
+// l is the array size - 1.
+void NumToStr(word n, char s[], byte l){
+  // Serial.print(F("n = "));
+  // Serial.println(n);
+  // pPrint2ln(s,10);
+  byte i = 0;
+  byte x,t;
+  if(n==0){
+    s[1] = '0';
+    i++;
+  }
+  while (n > 0){
+    i++;
+    s[i] = (n % 10) + '0';
+    n /= 10;
+  }
+  s[0] = i;
+  if(l > i+1) s[i+2] = 0;
+  x = s[0];
+  x << 2;
+  for(i=1; i > x; i++){
+    t = s[i];
+    s[i] = s[s[0] - (i-1)];
+    s[s[0] - (i-1)] = t;
+  }
+  //pPrint2ln(s,10);
 }
 
 void cTo_pString(char s[], byte l){
@@ -51,6 +92,34 @@ void pPrint(const char s[]){
   }
   Serial.print("'");
 }
+
+void pPrint2(const char s[], byte l){
+  byte i;
+  byte ln = s[0];
+  char c;
+  Serial.print('[');
+  Serial.print(ln);
+  Serial.print("]'");
+  for(i=1; i <= l; i++){
+    c = s[i];
+    if(c < 32){
+      Serial.print('[');
+      Serial.print(i);
+      Serial.print("=");
+      Serial.print(c, DEC);
+      Serial.print("]");
+    }
+    Serial.print(c);
+    //Serial.print('\'');
+  }
+  Serial.print("'");
+}
+
+void pPrint2ln(const char s[], byte l){
+  pPrint2(s, l);
+  Serial.println();
+}
+
 void pPrintln(const char s[]){
   pPrint(s);
   Serial.println();
@@ -246,6 +315,25 @@ void addS(char s1[], const char s2[], byte rLength){// Max return length is the 
 #endif  
 
 }
+void addSC(char s1[], char c, byte rLength){// Max return length is the sizeof the array pointed to by s1 in this case.
+  if(s1[0] < rLength){ 
+    s1[0]++;
+    s1[s1[0]] = c;
+  }
+  if( s1[0] < rLength) { s1[s1[0] + 1 ] = 0;} 
+}
+
+void addSc(char s1[], char cS[], byte rLength){// add a c string to a pascal type.
+  byte i;
+  i = 0;
+  while( (i + s1[0] < rLength) ){
+    s1[i+ s1[0] + 1] = cS[i];
+    if (cS[i] == 0){ break; }
+    i++;
+  }
+  s1[0] = s1[0] + i;
+}
+
 
 void JoinS1C(const char* s1, const char* s2, char c, char r[], byte rLength){
   if(r != s1){
@@ -267,7 +355,7 @@ void JoinS(const char s1[], const char s2[], char r[], byte rLength){
   Serial.println(rLength);
 #endif
   if((r != s1) ){
-    r[0] =0;
+    r[0] = 0;
     addS(r, s1, rLength);
   }
   addS(r, s2, rLength);

@@ -14,7 +14,9 @@ const char* mqtt_serverIp = "192.168.11.170";
 
 #define _str_join(B, C)
 
-char relayMqttTopicBase[] = "h1/c01/";
+char id_as_str[6];
+
+char relayMqttTopicBase[unit_prefix_len + 2]; // con
 
 const char* relay1MqttTopic = "\13outside/s/e";//h1 for house 1, s = south & e = east
 const char relay2MqttTopic[] = {11,'o','u','t','s','i','d','e','/','e','/', 's'} ;// "\x03e" = 1 char = to 0x3E apparently ;(
@@ -61,8 +63,19 @@ void Publish(const char* s, char* bufz){
   AddS_(temp_pString, s);
 //#ifdef _mqtt_debug
   Serial.print( F("MQTT publish. Topic: ") );
-  pPrintln(temp_pString);
-  mqtt_client.publish(temp_pString+1, bufz);
+  pPrint(temp_pString);
+  if( !mqtt_client.connected() ){
+    MqttConnect();
+  }
+  if( mqtt_client.publish(temp_pString+1, bufz) ){
+    Serial.println( F(", Successful publish") );
+  } else {
+    if(mqtt_client.connected()){
+      Serial.println( F(", Unsuccessful publish but conected"));
+    } else {
+      Serial.println( F(", Can't publish, unconected") );
+    }
+  }
 }
 void MqttPushRelayState(byte r){
   Serial.print( F("MqttPushRelayState called with r = "));
@@ -123,46 +136,76 @@ void MqttPushRelayState(byte r){
   
 void MQTT_setup(){
 //  Ethernet.begin(mac, ip);
-//  initVars();
+//  initVars(); NumToStr(unit_id, id_as_str, 5);// n is the number, s is the array to retur the string in, l is the array size - 1.
+
   mqtt_client.setServer(mqtt_serverIp , 1883);
   mqtt_client.setCallback(callback);
+  //mqtt_connecton_check();
 }
 
+boolean MqttConnect(){
+  boolean conected_r;
+  if (mqtt_client.connected() ){
+    Serial.println( F("MQTT alread connected"));
+    conected_r = true;
+  } else {
+    Serial.print( F("Mqtt state: ") ); Serial.println(mqtt_client.state () );
+    Serial.print( F("Attempting MQTT connection..."));
+    conected_r = mqtt_client.connect(id_as_str);
+    // Serial.print( F("Debug, mqtt_client.connect(\""));
+    // Serial.print(id_as_str+1);
+    // Serial.println( F( "\") returned: ") );
+    if (conected_r) {
+      Serial.println( F(" Connected"));
+      // Once connected, publish an announcement...
+      mqtt_client.publish(relayMqttTopicBase+1, "connected");
+      // ... and resubscribe
+      JoinS_(relayMqttTopicBase, "\x1#", temp_pString)// "\x1" is an array of length 3 with {1, '#', 0}
+      //pPrint2ln(temp_pString, temp_pString[0]+2);
+      Serial.print( F("Subscribed to topic: '") );
+      Serial.println( (temp_pString + 1) );
+      if(mqtt_client.subscribe((temp_pString + 1), 1) ) {
+      }
+      else {// subscribe failed
+        Serial.println( F("': Failed") ); 
+      }
+    } else {// connect failed
+      Serial.print( F("Failed, "));
+      Serial.print( F("Mqtt state: ") ); Serial.println(mqtt_client.state () );
+      if(mqtt_client.state() == -2){Serial.print( F(", The network connection failed (unplugged?)") );}
+      Serial.println();
+    }
+  }
+  Serial.print( F("connected still? ") );  Serial.println(mqtt_client.connected() );
+}
 
-
-boolean reconnect() {
+boolean mqtt_connecton_check() {
   static byte failDelay = 0;
+  boolean conected_r;
+  static boolean first_call = true;
+ // unsigned long lastcalled;
   if(failDelay > 0){
     delay(100);// tenth of a second
     failDelay--;
     return false;
+  } else {
+    //lastcalled = millis();
+    if(!first_call ) failDelay = 190;//delay for 19 seconds as other stuf each loop may take smoe time.
+    first_call = false;
   }
   // Loop until we're reconnected
-  if (!mqtt_client.connected()) {
-    Serial.print( F("Attempting MQTT connection..."));
-    // Attempt to connect
-    if (mqtt_client.connect("li_o")) {
-      Serial.println( F("connected"));
-      // Once connected, publish an announcement...
-      mqtt_client.publish("h1/outside/light","connected");
-      // ... and resubscribe
-      JoinS_(relayMqttTopicBase, "\x1#", temp_pString)
-      if(mqtt_client.subscribe((temp_pString + 1), 1) ) {
-        Serial.println( F("Subscribed to topic: ") ); 
-        pPrintln(temp_pString);
-      }
-      else {Serial.println( F("failed to subscribed") ); }
-      
+  conected_r = mqtt_client.connected();
+  if (!conected_r) {
+    conected_r = MqttConnect();
+    if (conected_r) {
+      // all good
     } else {
-      Serial.print( F("failed, rc=") );
-      Serial.print(mqtt_client.state());
       Serial.println( F(" try again in 20 seconds") );
-      // Wait 5 seconds before retrying
-//      delay(5000);
-      failDelay = 190;//delay for 19 seconds as other stuf each loop may take smoe time.
       return false;
     }
   }
+    Serial.print( F("+++++++ Debug2, mqtt_client.connected() = ") );
+    Serial.println(mqtt_client.connected());
   return true;
 }
 

@@ -6,12 +6,13 @@
 #include "pString.h"
 
 byte unit_id;
+byte netwokState = 0;
 
 void resetW5500(){
     pinMode(W5500_RESET_PIN, OUTPUT);
-    digitalWrite(W5500_RESET_PIN, LOW);
+    digitalWrite( W5500_RESET_PIN, LOW);
     delay(10);
-    digitalWrite(W5500_RESET_PIN, HIGH);
+    digitalWrite( W5500_RESET_PIN, HIGH);
     delay(2*1000);
 }    
 
@@ -43,9 +44,16 @@ byte IP_offsetSetup(){
 }
 
 void initMqttVars(){
-  cTo_pString( relayMqttTopicBase );
-  if(unit_id > 9) {relayMqttTopicBase[5] = (unit_id / 10) + '0'; }
-  relayMqttTopicBase[6] = (unit_id % 10) + '0';
+  NumToStr(unit_id+1000 , id_as_str, 5);
+  id_as_str[1]= 'c';
+  relayMqttTopicBase[0] = 0;// String length set to zero
+  relayMqttTopicBase[unit_prefix_len+1] = 0; // Make sure there is a Zero at end of string
+  addSc(relayMqttTopicBase, house_id, 10);
+  if ( unit_id > 99) {addSc(relayMqttTopicBase, "/c", unit_prefix_len); }
+  else if(unit_id > 9) {addSc(relayMqttTopicBase, "/c0", unit_prefix_len); }
+  else  {addSc(relayMqttTopicBase, "/c00", unit_prefix_len); }
+  addSC(relayMqttTopicBase, (unit_id % 10) + '0', unit_prefix_len);
+  addSC(relayMqttTopicBase, '/', unit_prefix_len);
 }
 
 
@@ -63,7 +71,7 @@ void printRelaysInfo(){
   
 void startWebServer(){
   server.begin();
-  Serial.print(F("server is at ") );
+  Serial.print(F("Web server on this board is at: ") );
   Serial.println(Ethernet.localIP());
   byte macBuffer[6];  // create a buffer to hold the MAC address
   Ethernet.MACAddress(macBuffer); // fill the buffer
@@ -77,15 +85,33 @@ void startWebServer(){
   Serial.println();
 }
 
-void checkEthernet(){
+bool checkEthernet(){
   // Check for Ethernet hardware present
+  Serial.print(F("Ethernet shield: "));
   if (Ethernet.hardwareStatus() == EthernetNoHardware) {
-    Serial.println(F("Ethernet shield was not found.  Sorry, can't run without hardware. :(") );
-    while (true) {
-      delay(1); // do nothing, no point running without Ethernet hardware
+    Serial.print("was not found.");
+    return false;
+  }
+  else if (Ethernet.hardwareStatus() == EthernetW5100) {
+    Serial.print(F("W5100") );
+  }
+  else if (Ethernet.hardwareStatus() == EthernetW5200) {
+    Serial.print(F("W5200") );
+  }
+  else if (Ethernet.hardwareStatus() == EthernetW5500) {
+    Serial.print(F("W5500"));
+  }
+  else {Serial.print(F("chip un")); }
+  Serial.println(F(" detected."));
+  Serial.print(F("Link status: ") );
+  if (Ethernet.linkStatus() == Unknown) {
+    Serial.println(F("unknown. Detection only on W5200 & W5500.") );
+  } else {
+    Serial.println(F("Ethernet cable "));
+    if (Ethernet.linkStatus() == LinkOFF) {// Not work on 5100
+      Serial.println(F("not ") );
     }
+    Serial.println(F("connected.") );
   }
-  if (Ethernet.linkStatus() == LinkOFF) {
-    Serial.println(F("Ethernet cable is not connected.") );
-  }
+  return true;
 }

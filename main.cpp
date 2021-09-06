@@ -14,6 +14,8 @@ Created to start with by copying from The examples of the libraries used.
 Joseph
  
  */
+#define _pString_debug
+#define _mqtt_debug
 
 #include <SPI.h>
 #include <Ethernet.h>
@@ -25,6 +27,12 @@ Joseph
 #include "mqtt.h"
 #include <avr/wdt.h>
 #include "s.h"
+
+//#include <Wire.h>
+
+#ifdef uses_I2C__
+ I2C_expander_IO expand_io;
+#endif
 
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
@@ -49,6 +57,7 @@ EthernetServer server(80);
 
 void setup() {
   //byte id, i;
+  //====== Setup the serial line used for debuging
   Serial.begin(9600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
@@ -62,21 +71,36 @@ void setup() {
   if (eth_chip == _W5100){ Serial.println("W5100"); }
   else if (eth_chip == _W5500){ Serial.println("W5500"); }
   else {Serial.println();}
+
+
+//testing
+//Wire.begin();
+//  Wire.beginTransmission(0x20); //begins talking to the slave device
+//  Wire.write(0x00); //selects the IODIRA register
+//  Wire.write(0); //this sets all port A pins to outputs
+//  Wire.endTransmission(); //stops talking to device
+//
+//  Wire.beginTransmission(0x20); //begins talking to the slave device
+//  Wire.write(0x12); //selects the IODIRA register
+//  Wire.write(0x0f); //this sets all port A pins to outputs
+//  Wire.endTransmission(); //stops talking to device
+//  
+
+//+++++++++++++++++++++++++++++++++Setup I2C io expander ++++++++++++++++
+#ifdef uses_I2C__
+ expand_io.init();
+
+ expand_io.setPinA(0x0f^0xff);
+#endif
   
-  
-  IP_offsetSetup();
-  initMqttVars();// Setup mqtt base unit name id and converts pascal type string. the 01 part of: char relayMqttTopicBase[] = "h1/c01/";
+//+++++++ Setup the board id. The id is added to the base ip address. Also used as part of the mqtt string
+  IP_offsetSetup();// checks if an id is saved in eeprom and if so loads it. If not saves boardid as NextBoardId.
   wdt_enable(WDTO_8S);
-  // MQTT setup.
-  //Serial.println(F("Call MQTT_setup") );
-  MQTT_setup ();
-  //Serial.println(F("returned MQTT_setup") );
-  wdt_reset();
   // Open serial communications and wait for port to open:
   //Serial.println("Ethernet WebServer Example");
 
 // can be a problem to leave internet module reset line floting?
-  resetW5500(); //so reset it as it can also need a reset with power fail to module.
+  resetW5500(); //This messes with pin 9. Uno size shields don't use it. So reset it as it can also need a reset with power fail to module.
   wdt_reset();
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip, dns, gateway,subnet);
@@ -85,13 +109,29 @@ void setup() {
   // Check for Ethernet hardware present
   //Serial.println(F("Call checkEthernet") );
   wdt_reset();
-  checkEthernet();
+  if (checkEthernet() ){// Ethernet cable conection part of check only works on W5200 & W5500 chips
+    netwokState = 1;
+  // Mqtt connection needs ethernet connection.
+    // MQTT setup.
+    //Serial.println(F("Call MQTT_setup") );
+    MQTT_setup(); // mqtt server and callback
+    wdt_reset();
+    initMqttVars();// Setup mqtt base unit name id and to converts pascal type string. the 01 part of: char relayMqttTopicBase[] = "h1/c01/";
+    Serial.print(F("mqtt base(relayMqttTopicBase):") );
+    pPrintln(relayMqttTopicBase);
+    Serial.print(F("Connect to Mqtt server at: ") ); Serial.println(mqtt_serverIp);
+    MqttConnect();
   
-  // start the web server (on port 80)
-  //Serial.println(F("Call startWebServer()") );
-  wdt_reset();
-  startWebServer();
-  //Serial.println(F("Call printRelaysInfo();") );
+    // start the web server (on port 80)
+    //Serial.println(F("Call startWebServer()") );
+    wdt_reset();
+    startWebServer();
+    
+  } else {
+    netwokState = 0;
+    Serial.println(F("Continuing without Network") );
+  }
+  Serial.println(F("Call printRelaysInfo();") );
   wdt_reset();
   printRelaysInfo();
   Serial.println( F("++++++++++++++Call SetUpRelays();") );
@@ -101,67 +141,83 @@ void setup() {
   Serial.println( F("Reached end of main Setup function.\n"));
 }
 
-
+unsigned long  loopc = 0;
+byte onetime = true;
 void loop() {
   wdt_reset();
-  //byte i;
-
-//Check for MQTT messages.
-  if (!mqtt_client.connected()) {
-    if(reconnect() ){
+  if(netwokState == 1){// 0 = no ethernet hardware found.
+    loopc++;
+  //Check for MQTT messages.
+    if (!mqtt_client.connected()) {
+      //if(reconnect() ){
+      //}
+      //reconnect();
+      if(onetime <= 10) {
+        onetime++;
+        Serial.print( F("Disconected at loop: ") );
+        Serial.println(loopc);
+        
+        //MqttConnect();
+      }
+      mqtt_connecton_check();
     }
-  }
-  if (mqtt_client.connected()) { mqtt_client.loop(); }
-
-  // listen for incoming clients
-
+    if (mqtt_client.connected()) { mqtt_client.loop(); }
+    //Serial.print( F("main loop: mqtt_client.connected = ") );
+    //Serial.println( mqtt_client.connected() );
   
-  EthernetClient client = server.available();
-  if (client) {
-    wdt_reset();
-    Serial.println( F("new client") );
-    found_GET = false;
-    lineS[0] = 0;
-    // an http request ends with a blank line
-    boolean currentLineIsBlank = true;
-    while (client.connected()) {
-      if (client.available()) {
-        char c = client.read();
-        LookForGet(lineS, c);//add c to lineS when c is new line char check if GET is in this line, if so stop looking else set string to "" and start again.
-
-        Serial.write(c);
-        // if you've gotten to the end of the line (received a newline
-        // character) and the line is blank, the http request has ended,
-        // so you can send a reply
-        if (c == '\n' && currentLineIsBlank) {
-          // send a standard http response header
-          html_head(client);
-          if(found_GET){
-            parseString();
+    // listen for incoming clients
+  
+    
+    EthernetClient client = server.available();
+    if (client) {
+      wdt_reset();
+      Serial.println( F("new client") );
+      found_GET = false;
+      lineS[0] = 0;
+      // an http request ends with a blank line
+      boolean currentLineIsBlank = true;
+      while (client.connected()) {
+        if (client.available()) {
+          char c = client.read();
+          LookForGet(lineS, c);//add c to lineS when c is new line char check if GET is in this line, if so stop looking else set string to "" and start again.
+  
+          Serial.write(c);
+          // if you've gotten to the end of the line (received a newline
+          // character) and the line is blank, the http request has ended,
+          // so you can send a reply
+          if (c == '\n' && currentLineIsBlank) {
+            // send a standard http response header
+            html_head(client);
+            if(found_GET){
+              parseString();
+            }
+  
+            html_buttons(client);
+            // out put relay state to html
+            html_foot(client);
+            break;
           }
-
-          html_buttons(client);
-          // out put relay state to html
-          html_foot(client);
-          break;
-        }
-        if (c == '\n') {
-          // you're starting a new line
-          currentLineIsBlank = true;
-        } else if (c != '\r') {
-          // you've gotten a character on the current line
-          currentLineIsBlank = false;
+          if (c == '\n') {
+            // you're starting a new line
+            currentLineIsBlank = true;
+          } else if (c != '\r') {
+            // you've gotten a character on the current line
+            currentLineIsBlank = false;
+          }
         }
       }
+      wdt_reset();
+      // give the web browser time to receive the data
+      delay(200);
+      // close the connection:
+      client.stop();
+      Serial.println(F("Finished, disconnected web client") );
+      Serial.print( F("found_GET = "));
+        Serial.println(found_GET);
+      
     }
-    wdt_reset();
-    // give the web browser time to receive the data
-    delay(10);
-    // close the connection:
-    client.stop();
-    Serial.println(F("client disconnected") );
-    Serial.print( F("found_GET = "));
-      Serial.println(found_GET);
-    
-  }
+  }// end of network hardwere found block
+  // handale local hardware pin and I2C switches.
+  wdt_reset();
+  
 }

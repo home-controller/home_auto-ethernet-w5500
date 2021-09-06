@@ -15,6 +15,7 @@
  #define mem_sram 2048
  #define _pwmPins {3, 5, 6, 9, 10, 11}//timer intafears with 5 & 6
  #define InOnlyPins = 2 // ATmega328P chips have 2 analog input only pins namely A6 & A7. Some older boards do not bring them out to pins but most do.
+ #define _i2c__
 #endif  
 
 // Arduino board types
@@ -42,7 +43,7 @@
 #ifdef _Uno
   #define eth_board_type  t_Ethershield
   #define eth_chip _W5100
-#elif _Nano
+#elif defined(_Nano)
   #define eth_board_type t_Module
   #define eth_chip _W5500
 #endif 

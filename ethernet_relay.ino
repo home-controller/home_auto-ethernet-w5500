@@ -1,3 +1,5 @@
+
+#define _pString_debug
 /*
   Web Server / MQTT client to control relays.
 
