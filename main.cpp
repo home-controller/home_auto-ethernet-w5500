@@ -216,6 +216,7 @@ void loop() {
         Serial.println(found_GET);
       
     }
+
   }// end of network hardwere found block
   // handale local hardware pin and I2C switches.
   wdt_reset();
