@@ -146,7 +146,7 @@ void loop() {
       Serial.println(found_GET);
     }
   }  
-  else testEthernet();
+  //else testEthernet(); todo: maybe recheck if ethernet boad conected now and then or could just reboot.
   if (checkInput() ){
     SwitchesExe(); //Func is bebounced
     //Serial.println(F("checkInput() found changed pin") );

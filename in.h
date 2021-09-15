@@ -12,8 +12,8 @@
 
 extern byte pinsA_in[no_of_switchs];
 //for more than 8 switch inputs will need to change type of use array.
-extern byte switchState;// 0 = off, 1 = on
-extern byte switchOnVal;// eg 0 for pull the relay LOW to turn on, 1 for pull high. Pull opposite to turn off. Or should it be set to input to turn off?
+extern byte switchState[no_of_switchs];// 0 = off, 1 = on
+//extern byte switchOnVal;// eg 0 for pull the relay LOW to turn on, 1 for pull high. Pull opposite to turn off. Or should it be set to input to turn off?
 
 
 void SetUpInputs();

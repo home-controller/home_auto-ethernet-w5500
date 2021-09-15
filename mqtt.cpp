@@ -27,7 +27,7 @@ const char relay7MqttTopic[] = {10,'f','2','/','j','u','n','k','/','e','2'} ;
 const char relay8MqttTopic[] = {9,'f','2','/','j','u','n','k','/','w'} ;
 ////{9,'f','2','/','j','u','n','k','/','w'} ;
 //relay9MqttTopic[0]= (char) sizeof(relay9MqttTopic)-1;//don't count trailing 0
-pStr relay9MqttTopic = pStr_("f2/stairs");
+pStr relay9MqttTopic;// = {9,"dfgfg"};//pStr_("f2/stairs");
 
 #define tempStrMaxLen 30
 char temp_pString[tempStrMaxLen + 1];

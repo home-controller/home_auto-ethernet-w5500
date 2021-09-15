@@ -5,7 +5,7 @@
 byte pinsA_in[no_of_switchs]  = { inPins };
 
 //for more than 8 switch inputs will need to change type of use array.
-byte switchState = 0;// 0 = off, 1 = on
+byte switchState[no_of_switchs];// 0 = off, 1 = on
 byte switchOnVal in_initHLa;// eg set bit to 1 for logic high being on(5v) and 0 for logic low being on.
 byte newSwitchState; // needs to be same type as switchState.
 byte deboMsk = 0;
@@ -64,6 +64,15 @@ boolean checkInput(){
 #define s1Msk B00000001
 #define s2Msk B00000010
 #define s3Msk B00000100
+
+/** Check for changes no more than 1/10 of a second, If sending mqtt or web page may be longer?. Should be good for debounce?
+  * If same switch changes again in less than 2 seconds add one to switch state to max of 8. 
+  * stateVar      : 0b0000 0000 
+  *  state        : 0b0000 0001  current state, incloulding updated mqtt etc. 0 = off 1 = on
+  *  last state   : 0b0000 0010  State at last check. 0 = off 1 = on 
+  *  change count : 0b0001 1100  Number of changes within 0.1 and 2 seconds betwean changes. max changes 8
+  *  time         : 0b0110 0000 time in 1/2 seconds since last change. Within 1/2 second
+**/  
 void SwitchesExe(){
 #ifdef _debug_switchs
   Serial.println(F("entering SwitchesExe()") );
