@@ -1,5 +1,6 @@
 
 #include "in.h"
+#include <Arduino.h>
 #include "relays.h"
 #include <avr/wdt.h>
 byte pinsA_in[no_of_switchs]  = { inPins };
