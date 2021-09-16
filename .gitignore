@@ -2,3 +2,4 @@
 *~
 # IDE files
 .theia
+*.orig
