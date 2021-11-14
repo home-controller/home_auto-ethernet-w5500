@@ -26,7 +26,7 @@ extern boolean found_GET;
 //char const key_on[3] = "\2on";
 //char const key_on[3] = "\2on";
 
-const char value_on[3] = {2, 'o', 'n'};
+extern const char value_on[3];// = {2, 'o', 'n'};
 extern char value_off[4];
 //char const key_on[3] = "\2on";
 //char const key_on[3] = "\2on";

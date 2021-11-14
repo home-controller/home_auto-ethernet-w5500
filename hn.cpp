@@ -1,4 +1,4 @@
-#include "hn.h";
+#include "hn.h"
 /*
  * slow Home Network.
  * 1: The line is pullup so to send data first pull it low.
@@ -23,7 +23,7 @@ void SlowHomeNet::IntCallback(){// expects 11 bit: 8 data 1 ack, 1 parity & 1 lo
   unsigned long t;
   word mod_t;
   byte state = _pinReg & _pinMask; //LOW = 0 but HIGH value will = the mask not 1.
-  word dTemp = 0;
+  //word dTemp = 0;
   // if last state change time > 9 bits + 1/3 bit margin and was low then reset and wait for new start.
   // 2: if was high then start counting.
   

@@ -20,9 +20,12 @@ boolean mqtt_connecton_check();
 boolean MqttConnect();
 void callback(char* topic, byte* payload, unsigned int length);
 void MQTT_setup();
+boolean reconnect();
 
 void MqttPushRelayState(byte r);
-//void (const char* s, const char* p, char* buf);  
+//void (const char* s, const char* p, char* buf);
+
+void MqttPushSwitchState(byte switchN, byte state);
 
 
 #endif

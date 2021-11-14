@@ -53,7 +53,7 @@
 // 0, 1 for USB
 // 14, 15 used for clock crystal
 // 3,5,6,7,8,A0,A1,A2,A3 defined in relays.h
-// 4 sd card select. maybe only shield, but might want card or eeprom module or others
+// 4 sd card select. maybe only shield, but might want card or eeprom module for others
 
 // 9 for ethernet module reset. defined in s.h
 // 10 eth select
@@ -65,6 +65,13 @@
 
 //how sad, 1 pin short for 10 relays. Will have to use shift reg IC at some point I guess.
 
+//==================================eeprom map========================
+#define No_groups 16                // 16 groups. for simplisity switch 1 maps to group 1 for now.
+#define group_size 2                //size in bytes. upto 16 relays with bitmap. If bitmap is 0 leave it to mqtt or web
+#define groups_eeprom_start 20
+// eeprom used 16 x 2 = 32. used address 20 to 51.
+
+//#define eepromIdAddr 250 //in s.h
 
 /*
 
@@ -148,4 +155,16 @@
 
 #endif
 */
+struct room_T{
+  byte lights;
+  byte roomType;
+  byte houseFloor;// 0 is always the lowest floor. so if 10 underground floors then ground floor is floor 9
+};
+struct room_TE{// T for type def. E for expanded out the bits into vars
+  room_T room;
+  byte roomNumLights;
+  byte roomSwitchCon;// switch sender/controller MCU
+  byte type;
+};
+
 #endif

@@ -1,11 +1,14 @@
 //#include "html.h"
-#include "relays.h"
-#include "pString.h"
-#include "html.h"
+#include "O.h" 
+#include "pStr.h"
 #include "mqtt.h"
 #include "defs.h"
 #include <Arduino.h>
 #include "s.h"
+#include "IO.h"
+
+extern const char value_on[3];// = {2, 'o', 'n'};
+extern char value_off[4];
 
 ;
 
@@ -60,7 +63,7 @@ void UpdateRelayStateI2c(byte n, byte v){
   }
 }
 
-void UpdateRelayState(byte n, byte v){// n = 1 for first relay
+void UpdateRelayState(byte n, byte v, bool updateMqtt = true){// n = 1 for first relay
   //This should be the only function used to turn the relays on/off etc.
   // v = 0 to turn off & 1 to turn on
 #ifdef _debug_relays
@@ -89,7 +92,7 @@ void UpdateRelayState(byte n, byte v){// n = 1 for first relay
   #else
     UpdateRelayStateI2c(n, v);
   #endif
-  MqttPushRelayState(n+1);//n had 1 subtracted above to work with 0 index arrays so +1 here.
+  if( updateMqtt and EthernetConected) MqttPushRelayState(n+1);//n had 1 subtracted above to work with 0 index arrays so +1 here.
   #ifdef _term_v
   Serial.print( F("Turn light ") );
   Serial.print(n+1);
@@ -116,56 +119,4 @@ void updateRelayState(char key[], char value[]){
   else if (StrCom(key, (char*)"\2l2")) { n=2; }
   else { return;}
   updateRelayState(n,value);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++ i2c expander class +++++++++++++++++++++++++++++++++++++++++++
-#include <Wire.h>
-bool wireSetup = false;
-I2C_expander_IO::I2C_expander_IO(){
-}
-void I2C_expander_IO::init(){
-  if (!wireSetup){
-    Wire.begin(); //creates a Wire objec
-    wireSetup = true;
-  }
-  updateOutPins();
-  
-}
-void I2C_expander_IO::setOutPins(word pinsBitmap){// set I/O pins to outputs or input
-  io_input = pinsBitmap;
-  updateOutPins();
-}
-
-void I2C_expander_IO::updateOutPins(){// set I/O pins to outputs or input
-  byte ioA,ioB;
-  ioA = lowByte(io_input);// io_input is a class var
-  ioB = io_input >> 8;
-  Wire.beginTransmission(i2c_control); //begins talking to the slave device
-  Wire.write(0x00); //selects the IODIRA register
-  Wire.write(ioA); //this sets all port A pins to outputs
-  Wire.endTransmission(); //stops talking to device
-  Wire.beginTransmission(0x20);//begins talking again to slave device
-  Wire.write(0x01); //selects the IODIRB register
-  Wire.write(ioB); // sets all port B pins to input(bit = 1) or outputs(bit = 0)
-  Wire.endTransmission(); //ends communication with slave device
-
-}
-void I2C_expander_IO::setPinA(byte bitMap)
-{
-  Wire.beginTransmission(i2c_control); //starts talking to slave device
-  Wire.write(0x12); //selects the GPIOA pins
-  Wire.write(bitMap); // turns on/off pins of GPIOA
-  Wire.endTransmission(); //ends communication with the device
-}
-
-void I2C_expander_IO::setPinB(byte bitMap)
-{
-  Wire.beginTransmission(i2c_control); //starts talking to slave device
-  Wire.write(0x13); //selects the GPIOB pins
-  Wire.write(bitMap); //turns on/off pins of GPIOA
-  Wire.endTransmission();//ends communication with the device
-}
-
-void I2C_expander_IO::setPin(byte pin, byte on){
-  
 }

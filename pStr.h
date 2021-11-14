@@ -26,6 +26,10 @@ byte StrLenZ(const char s[] );
 // s is the array to return the string in.
 // l is the array size - 1.
 void NumToStr(word n, char s[], byte l);
+void byteToString(byte n, char r[]);// array r needs to be at least 4 bytes long.
+void byteToStringPad(byte n, char r[]);
+void addByteToString (byte n, char r[],byte l);
+
 ;
 #define cTo_pString_( A ) cTo_pString(A, sizeof(A) - 1 );
 ;
@@ -65,7 +69,6 @@ void addSC(char s1[], char c, byte rLength);
 void JoinS(const char s1[], const char s2[], char r[], byte rLength);
 #define JoinS1C_(S,A,C,R) JoinS1C(S, A, C, R, sizeof(R) - 1 );
 void JoinS1C(const char* s1, const char* s2, char c, char r[], byte rLength);
-
 
 
 ;

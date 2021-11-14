@@ -1,6 +1,6 @@
 // pascal type strings.
 // Arrays of char with s[0] being the string length. So max length of 255
-#include "pString.h"
+#include "pStr.h"
 #include "defs.h"
 //{ the k String is looped through a char at a time }
 // if k or c not found in DelToC etc then do nothing
@@ -34,6 +34,71 @@
 //  char c[];
 //  
 //};
+
+void byteToString(byte n, char r[]){
+  byte h = 0;
+  byte t = 0;
+  while (n > 100){
+    h++;
+    n -= 100;
+  }
+  while (n > 30){
+    t += 3;
+    n -= 30;
+  }
+  if(n > 20){
+    t += 2;
+    n -= 20;
+  }
+  else if (n > 10){
+    t += 1;
+    n -= 10;
+  }
+  if(h>0){ 
+    r[0] = 3;
+    r[1] = h + 48; //48 is ascii code for 0.
+    r[2] = t + 48;
+    r[3] = n + 48; 
+  }
+  else if(t>0){ 
+    r[0] = 2;
+    r[1] = t + 48;
+    r[2] = n + 48; 
+  }
+  else { 
+    r[0] = 1;
+    r[1] = n + 48;
+  }
+}
+
+void byteToStringPad(byte n, char r[],byte l, byte offset = 0){
+  byte h = 0;
+  byte t = 0;
+  if (l< (3 + offset) ) { return;}
+  while (n > 100){
+    h++;
+    n -= 100;
+  }
+  while (n > 30){
+    t += 3;
+    n -= 30;
+  }
+  if(n > 20){
+    t += 2;
+    n -= 20;
+  }
+  else if (n > 10){
+    t += 1;
+    n -= 10;
+  }
+    r[0] = 3 + offset;
+    r[1 + offset] = h + 48; //48 is ascii code for 0.
+    r[2 + offset] = t + 48;
+    r[3 + offset] = n + 48; 
+}
+void addByteToString (byte n, char r[], byte l){
+  byteToStringPad(n, r, l, r[0]);
+}
 
 byte StrLenZ(const char z[]){
   byte i;
@@ -304,3 +369,11 @@ void JoinS(const char s1[], const char s2[], char r[], byte rLength){
 //  return i;
 //}
 //
+/*
+void * memcpy_P   (   void *    dest,
+    const void *    src,
+    size_t    n 
+  )   
+
+  */
+  

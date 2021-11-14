@@ -19,13 +19,13 @@ Joseph
 #include <Ethernet.h>
 #include <PubSubClient.h>
 #include "defs.h"
-#include "pString.h"
+#include "pStr.h"
 #include "html.h"
-#include "relays.h"
+#include "O.h"
 #include "mqtt.h"
 #include <avr/wdt.h>
 #include "s.h"
-#include "in.h"
+#include "I.h"
 
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
@@ -147,10 +147,5 @@ void loop() {
     }
   }  
   //else testEthernet(); todo: maybe recheck if ethernet boad conected now and then or could just reboot.
-  if (checkInput() ){
     SwitchesExe(); //Func is bebounced
-    //Serial.println(F("checkInput() found changed pin") );
-  } else {
-    //Serial.println(F("checkInput() no change found") );
-  }
 }
