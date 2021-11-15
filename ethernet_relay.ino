@@ -21,8 +21,9 @@ I.h and O.h = Higher level input and output. e.g. input: switches, e.g. output: 
        1: Keeps track of current state. On, off etc.
        2: make sure any change in state is not checked again for a bit to debounce switches etc.
        3: keep track of quick switches, slower than debounce but faster than a second or 2 for extra functionality. 
-          Turning all light of for example.
+          Turning all light on for example.
        4: handle keeping track of what the switch will do when switched.
+       5: group handeling.
 
 
 html.h =

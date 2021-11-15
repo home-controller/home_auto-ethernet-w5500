@@ -73,18 +73,19 @@ void setup() {
   MQTT_setup ();//setup ready for conecting.
   //Serial.println(F("returned MQTT_setup") );
   wdt_reset();
-  // Open serial communications and wait for port to open:
-  //Serial.println("Ethernet WebServer Example");
   ConnectEthernet();
   //Serial.println(F("Call printRelaysInfo();") );
   wdt_reset();
+  expand_io.init();
   printRelaysInfo();
   Serial.println( F("++++++++++++++Call SetUpRelays();") );
   wdt_reset();
  // wdt_disable();
   SetUpRelays();
+  Serial.println( F("No internal pullup mode for A6 & A7"));
+  Serial.print( F("A0 = "));Serial.print(A0); Serial.print( F(", A7 = "));Serial.println(A7);// Serial.print( F("D1 = "));Serial.print(D1);
   SetUpInputs();// Wall switches
-  Serial.println( F("Reached end of main Setup function.\n"));
+  Serial.print( F("main.cpp: End of Setup(). Line No.: "));Serial.println(__LINE__);
 }
 
 void loop() {

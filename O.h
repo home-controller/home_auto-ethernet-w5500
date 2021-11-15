@@ -2,22 +2,20 @@
 #define _Out_h
 
 #include <Arduino.h>
-
-
-#define no_of_relays 8
-//#define initHLa ={LOW,LOW,LOW,LOW,HIGH,HIGH,HIGH,HIGH}// the value to use to turn the relay etc. on. e.g. 0 for most relay modules, as they are pull low to turn on.
-#define initHLa ={LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW}// the value to use to turn the relay etc. on. e.g. 0 for most relay modules, as they are pull low to turn on.
-//#define relayPins 2,3,5,6,A0,A1,A2,A3 // 4 is SPI select for SD card.
-#define relayPins 1,2,3,4,5,6,7,8 // For use with i2c expander IOA is relays and IOB is input by default.
-#define defaultOffV 2 //2 is for set pin to input mode to turn off.
-
+#include "IO.h"
 
 
 ;
+extern I2C_expander_IO expand_io;
+
 //extern bool using_i2c_io = true;
-extern byte pinsA[no_of_relays];
-extern byte relayState[no_of_relays];// 0 = off, 1 = on
-extern byte relayOnVal[no_of_relays];// eg 0 for pull the relay LOW to turn on, 1 for pull high. Pull opposite to turn off. Or should it be set to input to turn off?
+extern byte const no_of_relays;
+
+extern byte pinsA[];
+extern byte pinsTypeA[];//0: mcu pins, 1: i2c_MCP23017, 5:shift register
+extern byte relayState[];// 0 = off, 1 = on
+extern byte relayOnVal[];// eg 0 for pull the relay LOW to turn on, 1 for pull high. Pull opposite to turn off. Or should it be set to input to turn off?
+extern byte relayOffVal[];//0: pull low to turn of, 1: pull high, 2: set pin to INPUT mode.
 // Should maybe set pin to input to turn off instead? 
 
 void SetUpRelays();

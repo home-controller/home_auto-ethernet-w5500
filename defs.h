@@ -1,6 +1,9 @@
 #ifndef _defs_h
 #define _defs_h
 
+// debuging
+//#define _debug_switchs
+
 // serial terminal feadback & debug. Needs to be before #includes to work with that file.
 #define _term_v
 //#define _debug_relays
@@ -49,10 +52,10 @@
 #endif 
 #define eth_type (eth_board_type + eth_chip)
 
-// Pins used;
+// Pins used; This is all the pins on a nano.
 // 0, 1 for USB
-// 14, 15 used for clock crystal
-// 3,5,6,7,8,A0,A1,A2,A3 defined in relays.h
+// 14, 15 used for clock crystal, must be translated as A0 = 14 to
+// 3,5,6,7,8,A0,A1,A2,A3 defined in relays.h A0 = 14 on nano
 // 4 sd card select. maybe only shield, but might want card or eeprom module for others
 
 // 9 for ethernet module reset. defined in s.h
@@ -66,10 +69,16 @@
 //how sad, 1 pin short for 10 relays. Will have to use shift reg IC at some point I guess.
 
 //==================================eeprom map========================
-#define No_groups 16                // 16 groups. for simplisity switch 1 maps to group 1 for now.
-#define group_size 2                //size in bytes. upto 16 relays with bitmap. If bitmap is 0 leave it to mqtt or web
+#define No_groups 20                // 16 groups. for simplisity switch 1 maps to group 1 for now.
+#define group_size 3      // size in bytes. upto 16(16bits) relays with bitmap + 1 for opts.  If bitmap is 0 leave it to mqtt or web
 #define groups_eeprom_start 20
-// eeprom used 16 x 2 = 32. used address 20 to 51.
+// eeprom used 20 x 3 = 60. used address 20 to 79.
+
+//switch to group index. 
+#define No_switches_eeprom_res 20
+#define switches_size 5 //5 bytes, 1 for quick, 1 for normal group, 3 for count 2, 3 and 4
+#define switches_eeprom_start 80
+// eeprom used 20 x 5 = 40. used address 80 to 179.
 
 //#define eepromIdAddr 250 //in s.h
 

@@ -58,6 +58,22 @@ extern byte room_note_i[15];// = {6,11,16,23,28,31,36,41,47,53,57,62,67,73,77};
 
 extern room_T rooms_A[no_of_rooms];
 
+// Pins used; This is all the pins on a nano.
+// 0, 1 for USB
+// 14, 15 used for clock crystal, must be translated as A0 = 14 to
+// 4 sd card select. maybe only shield, but might want card or eeprom module for others
+
+// 9 for ethernet module reset. defined in s.h
+// 10 eth select
+// 11, 12, and 13 for SPI
+// A4, A5 likley need for I2C at some point.
+
+// A6,A7 Wall switch input
+// D2 home net pin. As a plus this is one of the 2 int on pin change pins. The rest you int on a group with bitmasks etc. So use this to start with anyway.
+
+//usable pins
+// 3,5,6,7,8,A0,A1,A2,A3 defaults to relays with no expander A0 = 14 on nano
+
 
 
 

@@ -1,5 +1,5 @@
-#ifndef _in_h
-#define _in_h
+#ifndef _IO_h
+#define _IO_h
 
 
 /*
@@ -15,11 +15,14 @@
 /*
  * 
  */
+#define defaultOffV 2 //2 is for set pin to input mode to turn off.
+ 
  
 bool io_digitalWrite(byte pin, byte value);
 
 // +++++++++++++++++++++++++++++++++++++++++++++++ i2c expander class +++++++++++++++++++++++++++++++++++++++++++
 class I2C_expander_IO {// i.e. MCP23017 expander controlling relays or reading switches.
+  // pin No. starts at 0
   public:
     I2C_expander_IO();
     void init();
@@ -52,11 +55,12 @@ class I2C_expander_IO {// i.e. MCP23017 expander controlling relays or reading s
     //              :B00000001 = R/W bit, if 0 write or if 1 read
     byte i2c_control = 0b00100000;// fixed device addr(B0010 << 4) + (A0 << 1) + (A1 << 2) + (A2 << 3) + R/W bit
     word io_input = 0xff00; //(B00000000 << 8) + B11111111; // PAx set to Output(eg. switch relays) and PBx set to input(conect to switches) by default.
-    word lastIoValues = 0; // If the IO pins are high or low
+    byte lastIoValueA = 0; // If the IO pins are high or low
+    byte lastIoValueB = 0; // If the IO pins are high or low
     
 };
 
- extern I2C_expander_IO expand_io;
+// extern I2C_expander_IO expand_io;
 
 #endif
    

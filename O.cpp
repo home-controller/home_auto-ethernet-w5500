@@ -7,16 +7,17 @@
 #include "s.h"
 #include "IO.h"
 
-extern const char value_on[3];// = {2, 'o', 'n'};
+extern char value_on[3];// = {2, 'o', 'n'};
 extern char value_off[4];
-
 ;
 
-byte pinsA[no_of_relays]  = { relayPins };
+//declaire in main or setup
+  //byte pinsA[no_of_relays]  = { relayPins };
+  //byte pinsTypeA[no_of_relays];//0: mcu pins, 1: i2c_MCP23017, 5:shift register
 
-byte relayState[no_of_relays];
-byte relayOnVal[no_of_relays] initHLa ;// eg 0 for pull the relay LOW to turn on, 1 for pull high. Pull opisit to turn off. Or should it be set to input to turn off?
-byte relayOffVal[no_of_relays];//0: pull low to turn of, 1: pull high, 2: set pin to INPUT mode.
+//byte relayState[no_of_relays];
+//byte relayOnVal[no_of_relays] initHLa ;// eg 0 for pull the relay LOW to turn on, 1 for pull high. Pull opisit to turn off. Or should it be set to input to turn off?
+//byte relayOffVal[no_of_relays];//0: pull low to turn of, 1: pull high, 2: set pin to INPUT mode.
 
 void SetUpRelays(){
   byte i;
@@ -35,8 +36,8 @@ void SetUpRelays(){
 
 
 void ToggleRelayState(byte n){// n = 1 for first relay
-  Serial.print( F("Toggle light, light state: ") );
-  Serial.println(relayState[n-1] );
+//  Serial.print( F("Toggle light, light state: ") );
+//  Serial.println(relayState[n-1] );
   UpdateRelayState(n, (relayState[n-1] xor B00000001) );
 }
 
@@ -54,7 +55,8 @@ void UpdateRelayStatePins(byte n, byte v){
   }
 }
 
-void UpdateRelayStateI2c(byte n, byte v){
+void UpdateRelayStateI2c(byte n, byte v){// n = 1 for first relay
+  if(n > 0){ n--; };// most arrays and mcu pins start at 0;
   if(v==0){
     if(relayOnVal[n]==0){ expand_io.setPin(pinsA[n], 1);}
     else {expand_io.setPin(pinsA[n], 0);}
@@ -66,6 +68,7 @@ void UpdateRelayStateI2c(byte n, byte v){
 void UpdateRelayState(byte n, byte v, bool updateMqtt = true){// n = 1 for first relay
   //This should be the only function used to turn the relays on/off etc.
   // v = 0 to turn off & 1 to turn on
+//#define _debug_relays
 #ifdef _debug_relays
   ;
   Serial.print( F("UpdateRelayState called with relay = ") );
@@ -74,24 +77,37 @@ void UpdateRelayState(byte n, byte v, bool updateMqtt = true){// n = 1 for first
   Serial.print(v);
 #endif  
   if (n > no_of_relays){
-    Serial.println( F("Trying to switch more relays than we have.") );
+#ifdef _debug_relays
+    Serial.print( F("Trying to switch relay ") );Serial.print(n);    Serial.print( F(". We only have ") );Serial.println(no_of_relays);
+#endif  
     return;
   }
   if(n<1){
+#ifdef _debug_relays
     Serial.println( F("Relay No. can't be < 1") );
+    #endif
     return;
   }
   n--;//as the arrays start at 0 for the first elemet 0 will be relay 1 from here.
+//#define _debug_relays
 #ifdef _debug_relays
-  Serial.print(F(", pin = "));
+  Serial.print(F("pin = "));
   Serial.println(pinsA[n] );
 #endif  
   relayState[n] = v;
-  #if uses_I2C__ == 0
-    UpdateRelayStatePins(n, v);
-  #else
-    UpdateRelayStateI2c(n, v);
-  #endif
+  if(pinsTypeA[n] == 0){//mcu pin
+    //Serial.print(F("MCU: "));
+    UpdateRelayStatePins(n+1, v);
+  }
+  else if(pinsTypeA[n] == 1){//1: i2c_MCP23017, 5:shift register
+    //Serial.print(F("i2c_MCP23017: "));
+    UpdateRelayStateI2c(n+1, v);
+  }
+  else{
+    #ifdef _debug_relays
+    Serial.print( F("Unknown expander type: ") );Serial.print(pinsTypeA[n]);
+    #endif
+  }
   if( updateMqtt and EthernetConected) MqttPushRelayState(n+1);//n had 1 subtracted above to work with 0 index arrays so +1 here.
   #ifdef _term_v
   Serial.print( F("Turn light ") );
