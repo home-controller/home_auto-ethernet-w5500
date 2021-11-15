@@ -1,0 +1,5 @@
+#backups
+*~
+# IDE files
+.theia
+*.orig

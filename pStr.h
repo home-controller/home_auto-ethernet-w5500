@@ -18,8 +18,18 @@ struct pStr {
 
 void pPrint(const char s[]);
 void pPrintln(const char s[]);
+void pPrint2(const char s[], byte l);// for printing an array. s is a pointer, l is the length of to print. below 32 print as value not the asci char
+void pPrint2ln(const char s[], byte l);
 
 byte StrLenZ(const char s[] );
+// n is the number to convert.
+// s is the array to return the string in.
+// l is the array size - 1.
+void NumToStr(word n, char s[], byte l);
+void byteToString(byte n, char r[]);// array r needs to be at least 4 bytes long.
+void byteToStringPad(byte n, char r[]);
+void addByteToString (byte n, char r[],byte l);
+
 ;
 #define cTo_pString_( A ) cTo_pString(A, sizeof(A) - 1 );
 ;
@@ -53,11 +63,12 @@ void SplitK1( char s[],  const char k[], char r[], byte rLength);
 
 #define AddS_(R,S) addS(R, S, sizeof(R) - 1 );
 void addS(char s1[], const char s2[], byte rLength);
+void addSc(char s1[], char cS[], byte rLength);
+void addSC(char s1[], char c, byte rLength);
 #define JoinS_(A,C,R) JoinS(A, C, R, sizeof(R) - 1 );
 void JoinS(const char s1[], const char s2[], char r[], byte rLength);
 #define JoinS1C_(S,A,C,R) JoinS1C(S, A, C, R, sizeof(R) - 1 );
 void JoinS1C(const char* s1, const char* s2, char c, char r[], byte rLength);
-
 
 
 ;

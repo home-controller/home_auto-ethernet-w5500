@@ -1,8 +1,13 @@
 #include "mqtt.h"
-#include "pString.h"
-#include "relays.h"
+#include "pStr.h"
+#include "O.h"
 #include "defs.h"
 
+extern const char room_names[] PROGMEM;
+extern byte room_note_i[12];
+extern byte room_names_i[8];
+extern byte switchInfo[][3];
+extern room_T rooms_A[];
 
 
 // Make sure to leave out the http and slashes!
@@ -14,7 +19,8 @@ const char* mqtt_serverIp = "192.168.11.170";
 
 #define _str_join(B, C)
 
-char relayMqttTopicBase[] = "h1/c01/";//converted to pas string in s.cpp
+//char relayMqttTopicBase[] = "h1/c01/";//converted to pas string in s.cpp
+char relayMqttTopicBase[] = "h2/c01/";//converted to pas string in s.cpp
 
 const char* relay1MqttTopic = "\13outside/s/e";//h1 for house 1, s = south & e = east i.e. over rachels room
 const char relay2MqttTopic[] = {11,'o','u','t','s','i','d','e','/','e','/', 's'} ;// "\x03e" = 1 char = to 0x3E apparently ;( over my room
@@ -27,7 +33,7 @@ const char relay7MqttTopic[] = {10,'f','2','/','j','u','n','k','/','e','2'} ;
 const char relay8MqttTopic[] = {9,'f','2','/','j','u','n','k','/','w'} ;
 ////{9,'f','2','/','j','u','n','k','/','w'} ;
 //relay9MqttTopic[0]= (char) sizeof(relay9MqttTopic)-1;//don't count trailing 0
-pStr relay9MqttTopic = pStr_("f2/stairs");
+pStr relay9MqttTopic;// = {9,"dfgfg"};//pStr_("f2/stairs");
 
 #define tempStrMaxLen 30
 char temp_pString[tempStrMaxLen + 1];
@@ -67,13 +73,46 @@ void Publish(const char* s, char* bufz){
   pPrintln(temp_pString);
   if (mqtt_client.connected() ) mqtt_client.publish(temp_pString+1, bufz);
 }
+
+;;;;
+
+
+void MqttPushSwitchState(byte switchN, byte state){
+  Serial.print( F("MqttPushSwitchState(switch = "));
+  Serial.print(switchN);
+  Serial.print( F(", state = "));
+  Serial.println(switchN);
+  char bufz[] = "s=0";
+  char topic[30];
+  byte room = (switchInfo[switchN][1] bitand 0b1111);
+  byte floor1 = (rooms_A[room].houseFloor bitand 0b111);
+  bufz[2] = 48 + state;
+  if(switchN == 0){
+    Serial.println(F("Error: The first switch is 1") );
+  }
+  //byte f = floor1;
+  topic[0]= 1;
+  topic[1] = 'f';
+  addByteToString(floor1,topic, sizeof(topic) - 1);//has no array len checks
+  byte start;
+  if(switchN==1){ start = 0; }
+  else {start = room_names_i[switchN - 1]; }
+  byte l = room_names_i[switchN] - start;
+  if(topic[0] >= 30) return;
+  if(topic[0] + l >= 30) {l = (30-2) - topic[0];}// need 1 byte for length an 1 for zero terminator
+  memcpy_P(topic+1+topic[0], room_names + start, l);
+  topic[0] = l;
+
+  Publish(topic, bufz);
+}
+
 void MqttPushRelayState(byte r){
   Serial.print( F("MqttPushRelayState called with r = "));
   Serial.println(r);
   char bufz[] = "s=0";
   bufz[2] = 48 + relayState[r-1];
   if(r == 0){
-    Serial.println("Error: The first relay is 1");
+    Serial.println( F("Error: The first relay is 1") );
   }
   else if(r == 1){
     Publish(relay1MqttTopic, bufz);    

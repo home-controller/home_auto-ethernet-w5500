@@ -19,13 +19,13 @@ Joseph
 #include <Ethernet.h>
 #include <PubSubClient.h>
 #include "defs.h"
-#include "pString.h"
+#include "pStr.h"
 #include "html.h"
-#include "relays.h"
+#include "O.h"
 #include "mqtt.h"
 #include <avr/wdt.h>
 #include "s.h"
-#include "in.h"
+#include "I.h"
 
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
@@ -73,18 +73,19 @@ void setup() {
   MQTT_setup ();//setup ready for conecting.
   //Serial.println(F("returned MQTT_setup") );
   wdt_reset();
-  // Open serial communications and wait for port to open:
-  //Serial.println("Ethernet WebServer Example");
   ConnectEthernet();
   //Serial.println(F("Call printRelaysInfo();") );
   wdt_reset();
+  expand_io.init();
   printRelaysInfo();
   Serial.println( F("++++++++++++++Call SetUpRelays();") );
   wdt_reset();
  // wdt_disable();
   SetUpRelays();
+  Serial.println( F("No internal pullup mode for A6 & A7"));
+  Serial.print( F("A0 = "));Serial.print(A0); Serial.print( F(", A7 = "));Serial.println(A7);// Serial.print( F("D1 = "));Serial.print(D1);
   SetUpInputs();// Wall switches
-  Serial.println( F("Reached end of main Setup function.\n"));
+  Serial.print( F("main.cpp: End of Setup(). Line No.: "));Serial.println(__LINE__);
 }
 
 void loop() {
@@ -146,11 +147,6 @@ void loop() {
       Serial.println(found_GET);
     }
   }  
-  else testEthernet();
-  if (checkInput() ){
+  //else testEthernet(); todo: maybe recheck if ethernet boad conected now and then or could just reboot.
     SwitchesExe(); //Func is bebounced
-    //Serial.println(F("checkInput() found changed pin") );
-  } else {
-    //Serial.println(F("checkInput() no change found") );
-  }
 }
