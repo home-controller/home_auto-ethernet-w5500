@@ -61,6 +61,7 @@ void getInputStates(){
 #ifdef _debug_switchs
   //#define _debug_switchs_gis
 #endif
+//#define _debug_switchs_gis
 #ifdef _debug_switchs_gis
   Serial.println(F("entering getInputStates()") );
 #endif
@@ -126,19 +127,17 @@ void setSwitchGroups(byte switchN, byte quick_i, byte normal_i, byte count2_i, b
 }
 
 
-void Switched(byte sw, byte count, byte state){// Count 0 is quick on.
+void Switched(byte sw_i, byte count, byte state){// Count 0 is quick on. sw = 0 for first switch
   byte i_index, g_index, i, opt;
   word groupmask;
-  if(sw>1) {
-    sw--;
-  }
-  i = switches_eeprom_start + (switches_size * sw) + count;
+  i = switches_eeprom_start + (switches_size * sw_i) + count;
   EEPROM.get(i, i_index);
   g_index = groups_eeprom_start + (i_index*group_size);
   EEPROM.get(g_index, groupmask);
   EEPROM.get(g_index+2, opt);
-  #ifdef _debug_switchs
-  Serial.print(F("Switch index: ") ); Serial.print(sw);  Serial.print(F(", count: ") ); Serial.print(count);  Serial.print(F(", Group index: ") ); Serial.print(i_index);  Serial.print(F(", groupmask: b") ); Serial.print(groupmask, BIN);Serial.print(F(", "));
+  //#ifdef _debug_switchs
+  #ifdef _term_v
+  Serial.print(F("Switch index: ") ); Serial.print(sw_i);  Serial.print(F(", count: ") ); Serial.print(count);  Serial.print(F(", Group index: ") ); Serial.print(i_index);  Serial.print(F(", groupmask: b") ); Serial.print(groupmask, BIN);Serial.print(F(", "));
   #endif
   i=1;
   while (groupmask > 0){
@@ -192,7 +191,7 @@ void SwitchesExe(){
       if(count1 & 0b1){ // if count is an odd number and states are the same then changed.
         // count odd and state1 = state2, hence switch has changed position
         count1++;
-        //Serial.print(F("Changed at:") );Serial.println(__LINE__);
+        Serial.print(F("Switch ") ); Serial.print(i); Serial.print(F(" changed. line:") ); Serial.println(__LINE__);
         time1 = 0;
       }
       else {// No change.
@@ -201,16 +200,17 @@ void SwitchesExe(){
       }
     } 
     else {// States are different.
-      if(count1 == 0){
-#ifdef _debug_switchs
-        Serial.print(F("Call quick light on func: ") );
-#endif
-        Switched(i, 0, 1);// Switch relays etc.
-      }
       if( (count1 & 0b1) == 0){// check if switch state changed since last call.
         // count is even and state1 != state2, hence changed
         count1++;// as changed add to changed count
         time1 = 0;//reset time since last change
+        Serial.print(F("Switch ") ); Serial.print(i); Serial.print(F(" changed. line:") ); Serial.println(__LINE__);
+        if(count1 == 0){
+  #ifdef _debug_switchs
+          Serial.print(F("Call quick light on func: ") );
+  #endif
+          Switched(i, 0, 1);// Switch relays etc.
+        }
       }
       else {// if not change then add to time since last switch
         // count is odd and state1 != state2, hence not changed

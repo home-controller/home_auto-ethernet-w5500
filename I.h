@@ -7,6 +7,7 @@
 #include <Arduino.h>
 
 // TODO: move setup vars to extern and define in main.c or s.c  ?
+//              0  1  2  3  4
 #define inPins A7,A6,A0,A1,A2
 #define no_of_switchs 5
 #define in_initHLa = B00000011  //{HIGH,HIGH}// the value to use to for on.

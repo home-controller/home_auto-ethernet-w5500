@@ -9,7 +9,7 @@
 #include "defs.h"
 
 #define W5500_RESET_PIN 9 //if changed update comments in defs.h
-#define inPins A7,A6
+//#define inPins A7,A6
 
 //getta's house
 #define no_of_switchs 5
