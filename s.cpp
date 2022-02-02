@@ -78,8 +78,9 @@ byte IP_offsetSetup(){
   } else {
     Serial.print(F("Got") );
   }
-  Serial.print(F(" EEprom board ID:") );
-  Serial.println(id);
+  addByteToString_(id, mqtt_clientID);
+  Serial.print(F(" Board ID:") );
+  Serial.println(mqtt_clientID);
   ip[3] += id;
   mac[5] += id;
   unit_id = id;

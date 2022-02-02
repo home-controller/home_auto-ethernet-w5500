@@ -2,9 +2,9 @@
 #include <Arduino.h>
 #include "IO.h"
 
-/*
+/**
  * pin:
- *  0bOO011111  For pins first 5 bits(max32 is pin No
+ *  0bOO011111  For pins first 5 bits(max32 is pin No.
  */
 bool io_digitalWrite(byte pin, byte value){
   return 1;

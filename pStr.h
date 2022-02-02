@@ -28,6 +28,7 @@ byte StrLenZ(const char s[] );
 void NumToStr(word n, char s[], byte l);
 void byteToString(byte n, char r[]);// array r needs to be at least 4 bytes long.
 void byteToStringPad(byte n, char r[]);
+#define addByteToString_( N, S ) addByteToString(N, S ,sizeof(S) - 1 );
 void addByteToString (byte n, char r[],byte l);
 
 ;

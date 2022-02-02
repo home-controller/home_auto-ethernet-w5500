@@ -3,6 +3,11 @@
 /*
  * Stuff called on statup to.
  * Moved hear to clear up main.cpp
+ * 
+ * While s.cpp has code that initilizes stuff from most units/libs so is at the end of the depends tree,
+ * s.h is at the start and can have globle #def etc.
+ * simliar to defs.h  but this has stuf that can change(e.g. no. lights in a house) but defs has constants 
+ * that shoud never change for the same board(eg. led being on pin 13 on a UNO).
  */
 #include <Arduino.h>
 #include <Ethernet.h>

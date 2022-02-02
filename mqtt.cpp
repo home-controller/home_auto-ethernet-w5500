@@ -14,7 +14,7 @@ extern room_T rooms_A[];
 // const char* mqtt_server = "test.mosquitto.org";
 
 const char* mqtt_serverIp = "192.168.11.170";
-
+char mqtt_clientID[7]; //idxxx
 //const char* rootTopic = "xh1/outside/light/s/e";//h1 for house 1, s = south & e = east
 
 #define _str_join(B, C)
@@ -31,7 +31,7 @@ const char relay5MqttTopic[] = {9,'f','2','/','o','f','f','i','c','e'} ;
 const char relay6MqttTopic[] = {9,'f','2','/','j','u','n','k','/','e'} ;
 const char relay7MqttTopic[] = {10,'f','2','/','j','u','n','k','/','e','2'} ;
 const char relay8MqttTopic[] = {9,'f','2','/','j','u','n','k','/','w'} ;
-////{9,'f','2','/','j','u','n','k','/','w'} ;
+// // {9,'f','2','/','j','u','n','k','/','w'} ;.
 //relay9MqttTopic[0]= (char) sizeof(relay9MqttTopic)-1;//don't count trailing 0
 pStr relay9MqttTopic;// = {9,"dfgfg"};//pStr_("f2/stairs");
 
@@ -48,7 +48,12 @@ char temp_pString[tempStrMaxLen + 1];
 
   EthernetClient ethClient;
   PubSubClient mqtt_client(ethClient);
-
+/**
+ * @brief Publish s to mqtt server.
+ * 
+ * @param s in 
+ * @param bufz 
+ */
 void Publish(const char* s, char* bufz){
   const char p[8] = "\x6state/";
 #ifdef _mqtt_debug
@@ -174,6 +179,7 @@ void MQTT_setup(){
 
 boolean reconnect() {
   static byte failDelay = 0;
+  
   if(failDelay > 0){
     delay(100);// tenth of a second
     failDelay--;
@@ -183,7 +189,7 @@ boolean reconnect() {
   if (!mqtt_client.connected()) {
     Serial.print( F("Attempting MQTT connection..."));
     // Attempt to connect
-    if (mqtt_client.connect("li_o")) {
+    if (mqtt_client.connect(mqtt_clientID+1)) {
       Serial.println( F("connected"));
       // Once connected, publish an announcement...
       CopyFirst_(relayMqttTopicBase, relayMqttTopicBase[0]-1, temp_pString);

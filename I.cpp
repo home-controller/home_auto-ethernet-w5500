@@ -191,7 +191,7 @@ void SwitchesExe(){
       if(count1 & 0b1){ // if count is an odd number and states are the same then changed.
         // count odd and state1 = state2, hence switch has changed position
         count1++;
-        Serial.print(F("Switch ") ); Serial.print(i); Serial.print(F(" changed. line:") ); Serial.println(__LINE__);
+        //Serial.print(F("Switch ") ); Serial.print(i); Serial.print(F(" changed. line:") ); Serial.println(__LINE__);
         time1 = 0;
       }
       else {// No change.
@@ -204,7 +204,7 @@ void SwitchesExe(){
         // count is even and state1 != state2, hence changed
         count1++;// as changed add to changed count
         time1 = 0;//reset time since last change
-        Serial.print(F("Switch ") ); Serial.print(i); Serial.print(F(" changed. line:") ); Serial.println(__LINE__);
+        //Serial.print(F("Switch ") ); Serial.print(i); Serial.print(F(" changed. line:") ); Serial.println(__LINE__);
         if(count1 == 0){
   #ifdef _debug_switchs
           Serial.print(F("Call quick light on func: ") );
