@@ -3,3 +3,4 @@
 # IDE files
 .theia
 *.orig
+undefined/
