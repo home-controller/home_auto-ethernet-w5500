@@ -31,7 +31,7 @@ extern IPAddress gateway;//(192, 168, 11, 1);
 extern IPAddress subnet;//(255, 255, 240, 0);
 extern EthernetServer server;//(80);
 extern byte unit_id;
-extern boolean EthernetConected;
+extern boolean EthernetConnected;
 
 extern byte mac[];
 

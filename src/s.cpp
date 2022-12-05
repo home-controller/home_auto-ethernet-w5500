@@ -49,7 +49,7 @@ byte room_note_i[15] = {6,11,16,23,28,32,37,41,47,53,57,62,67,73,77};
 byte groupsSateA[No_groups +1] = {No_groups};
 
 
-boolean EthernetConected = false;
+boolean EthernetConnected = false;
 
 void resetW5500(){
     pinMode(W5500_RESET_PIN, OUTPUT);
@@ -218,21 +218,21 @@ const unsigned long millsD = (unsigned long)2 * 60 * 1000;// should be 2 minutes
     }
     EthlastTestMils =t;
   }
-  return EthernetConected;
+  return EthernetConnected;
 }
 
 boolean checkEthernet(){
   // Check for Ethernet hardware present
-  EthernetConected = false;
+  EthernetConnected = false;
   if (Ethernet.hardwareStatus() == EthernetNoHardware) {
     Serial.println(F("Ethernet shield was not found.") );
   } else {
     if (Ethernet.linkStatus() == LinkOFF) {
       Serial.println(F("Ethernet cable is not connected.") );
     }
-    else EthernetConected = true;
+    else EthernetConnected = true;
   }
-  return EthernetConected;
+  return EthernetConnected;
 }
 
 void ConnectEthernet(){

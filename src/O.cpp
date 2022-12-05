@@ -108,7 +108,7 @@ void UpdateRelayState(byte n, byte v, bool updateMqtt = true){// n = 1 for first
     Serial.print( F("Unknown expander type: ") );Serial.print(pinsTypeA[n]);
     #endif
   }
-  if( updateMqtt and EthernetConected) MqttPushRelayState(n+1);//n had 1 subtracted above to work with 0 index arrays so +1 here.
+  if( updateMqtt and EthernetConnected) MqttPushRelayState(n+1);//n had 1 subtracted above to work with 0 index arrays so +1 here.
   #ifdef _term_v
   Serial.print( F("Turn light ") );
   Serial.print(n+1);

@@ -4,3 +4,6 @@
 .theia
 *.orig
 undefined/
+
+# pio build files
+.pio/

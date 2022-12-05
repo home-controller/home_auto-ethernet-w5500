@@ -31,7 +31,7 @@ void SetUpInputs(){
   for(i=0; i<no_of_switchs;i++){
     Serial.print(F("MCU pin '") ); Serial.print(pinsA_in[i]); Serial.print(F("' set to input, Switch No. = ") ); Serial.println(i);
     pinMode(pinsA_in[i], INPUT_PULLUP);      // sets the input pins as input. Pullup works on A0 to A5 but A6 & A7 still float
-    //pinMode(pinsA_in[i], INPUT);      // sets the input pins as input. If not use pullup may be able to detect bad conection.
+    //pinMode(pinsA_in[i], INPUT);      // sets the input pins as input. If not use pullup may be able to detect bad conenction.
     if(ReadSwitch(i) ) {
       switchState[i] = 0b11;
     } else {
@@ -76,10 +76,10 @@ void getInputStates(){
     }
 /*    
   * switchState[i]: 
-  *  state          : 0b0000 0001  Fully updated state, incloulding updated mqtt etc. 0 = off 1 = on
+  *  state          : 0b0000 0001  Fully updated state, including updated mqtt etc. 0 = off 1 = on
   *  current state  : 0b0000 0010  State at last check. Current switch state but count may still be updating etc. 0 = off 1 = on 
-  *  change count   : 0b0000 1100  Number of changes within 0.1 and 2 seconds betwean changes. max changes 8, maybe 7. Use diference of bit 1 and 2 as first bit
-  *  time         : 0b1111 0000 time in 1/8 seconds since last change. Within aprox 1/8 second
+  *  change count   : 0b0000 1100  Number of changes within 0.1 and 2 seconds between changes. max changes 8, maybe 7. Use difference of bit 1 and 2 as first bit
+  *  time         : 0b1111 0000 time in 1/8 seconds since last change. Within approx 1/8 second
 */
 #ifdef _debug_switchs_gis 
  debugSwitch(i);
@@ -99,10 +99,10 @@ void getInputStates(){
 /** Check for changes no more than 1/8 of a second, If sending mqtt or web page may be longer?. Should be good for debounce?
   * If same switch changes again in less than 2 seconds add one to switch state to max of 8. 
   * stateVar      : 0b0000 0000 
-  *  state          : 0b0000 0001  Fully updated state, incloulding updated mqtt etc. 0 = off 1 = on
+  *  state          : 0b0000 0001  Fully updated state, including updated mqtt etc. 0 = off 1 = on
   *  current state  : 0b0000 0010  State at last check. Current switch state but count may still be updating etc. 0 = off 1 = on 
-  *  change count   : 0b0000 1100  Number of changes within 0.1 and 2 seconds betwean changes. max changes 8, maybe 7. Use diference of bit 1 and 2 as first bit
-  *  time         : 0b1111 0000 time in 1/8 seconds since last change. Within aprox 1/8 second
+  *  change count   : 0b0000 1100  Number of changes within 0.1 and 2 seconds between changes. max changes 8, maybe 7. Use difference of bit 1 and 2 as first bit
+  *  time         : 0b1111 0000 time in 1/8 seconds since last change. Within approx 1/8 second
 **/
 
 void groupSet(byte i, byte relays9_16, byte relays1_8, byte opts = 0){
@@ -142,11 +142,11 @@ void Switched(byte sw_i, byte count, byte state){// Count 0 is quick on. sw = 0 
   i=1;
   while (groupmask > 0){
     if(groupmask & 0b1){
-      //todo Need to add togle relay etc. Only does hard set to switch pos at min.
-      if(count = 1){
+      //todo Need to add toggle relay etc. Only does hard set to switch pos at min.
+      if(count == 1){
         UpdateRelayState(i, (groupsSateA[i_index+1] & 0b1) );
       }
-      else if(count = 0){
+      else if(count == 0){
         UpdateRelayState(i,1,false);
       }
       else {
@@ -162,7 +162,7 @@ void Switched(byte sw_i, byte count, byte state){// Count 0 is quick on. sw = 0 
     i++;
     groupmask =  groupmask >> 1;
   }
-      if(count = 1){
+      if(count == 1){
         groupsSateA[i_index+1] = groupsSateA[i_index+1] xor 0b1; // i starts at 1
       }
       else if(count > 1){

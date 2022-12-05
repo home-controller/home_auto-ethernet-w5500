@@ -1,0 +1,61 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "/home/jmnc2/doc/src/Arduino/home_auto/home_auto-ethernet-w5500/include",
+                "/home/jmnc2/doc/src/Arduino/home_auto/home_auto-ethernet-w5500/src",
+                "/home/jmnc2/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "/home/jmnc2/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "/home/jmnc2/doc/src/Arduino/home_auto/home_auto-ethernet-w5500/.pio/libdeps/nanoatmega328new/PubSubClient/src",
+                "/home/jmnc2/doc/src/Arduino/home_auto/home_auto-ethernet-w5500/.pio/libdeps/nanoatmega328new/Ethernet/src",
+                "/home/jmnc2/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "/home/jmnc2/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "/home/jmnc2/.platformio/packages/framework-arduino-avr/variants/eightanaloginputs",
+                "/home/jmnc2/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "/home/jmnc2/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/home/jmnc2/doc/src/Arduino/home_auto/home_auto-ethernet-w5500/include",
+                    "/home/jmnc2/doc/src/Arduino/home_auto/home_auto-ethernet-w5500/src",
+                    "/home/jmnc2/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "/home/jmnc2/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "/home/jmnc2/doc/src/Arduino/home_auto/home_auto-ethernet-w5500/.pio/libdeps/nanoatmega328new/PubSubClient/src",
+                    "/home/jmnc2/doc/src/Arduino/home_auto/home_auto-ethernet-w5500/.pio/libdeps/nanoatmega328new/Ethernet/src",
+                    "/home/jmnc2/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "/home/jmnc2/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "/home/jmnc2/.platformio/packages/framework-arduino-avr/variants/eightanaloginputs",
+                    "/home/jmnc2/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "/home/jmnc2/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=60105",
+                "ARDUINO_AVR_NANO",
+                "VERSION=0.0.1",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "__AVR_ATmega328P__",
+                ""
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerPath": "/home/jmnc2/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
+            "compilerArgs": [
+                "-mmcu=atmega328p",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}

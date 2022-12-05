@@ -1,4 +1,5 @@
-#include "mqtt.h"
+//#include "./mqtt.h"
+#include <mqtt.h>
 #include "pStr.h"
 #include "O.h"
 #include "defs.h"
@@ -22,7 +23,11 @@ char mqtt_clientID[7]; //idxxx
 //char relayMqttTopicBase[] = "h1/c01/";//converted to pas string in s.cpp
 char relayMqttTopicBase[] = "h2/c01/";//converted to pas string in s.cpp
 
-const char* relay1MqttTopic = "\13outside/s/e";//h1 for house 1, s = south & e = east i.e. over rachels room
+const char relay2ttMqttTopic[] = "t1"
+                                  "t2"
+                                  "t3";
+
+const char* relay1MqttTopic = "\13outside/s/e";//h1 for house 1, s = south & e = east i.e. over rachel's room
 const char relay2MqttTopic[] = {11,'o','u','t','s','i','d','e','/','e','/', 's'} ;// "\x03e" = 1 char = to 0x3E apparently ;( over my room
 const char relay3MqttTopic[] = {11,'o','u','t','s','i','d','e','/','s','/', 'w'} ;// "\x03e" = 1 char = to 0x3E apparently ;( tool room
 
@@ -33,14 +38,13 @@ const char relay7MqttTopic[] = {10,'f','2','/','j','u','n','k','/','e','2'} ;
 const char relay8MqttTopic[] = {9,'f','2','/','j','u','n','k','/','w'} ;
 // // {9,'f','2','/','j','u','n','k','/','w'} ;.
 //relay9MqttTopic[0]= (char) sizeof(relay9MqttTopic)-1;//don't count trailing 0
-pStr relay9MqttTopic;// = {9,"dfgfg"};//pStr_("f2/stairs");
+//pStr relay9MqttTopic;// = {9,"random"};//pStr_("f2/stairs");
 
 #define tempStrMaxLen 30
 char temp_pString[tempStrMaxLen + 1];
 //void initVars(){
-//  relay1MqttTopic[0] = sizeof(relay1MqttTopic) - 2;//-1 for 0 turm and 1 for length at [0]
-//  relay2MqttTopic[0] = sizeof(relay2MqttTopic) - 2;//-1 for 0 turm and 1 for length at [0]
-//}
+//  relay1MqttTopic[0] = sizeof(relay1MqttTopic) - 2;//-1 for 0 termination and 1 for length at [0]
+//  relay2MqttTopic[0] = sizeof(relay2MqttTopic) - 2;//-1 for 0 termination and 1 for length at [0]}
 
 
 //IPAddress MQTTserverIp(192, 168, 11, 170);
@@ -209,7 +213,7 @@ boolean reconnect() {
       Serial.println( F(" try again in 20 seconds") );
       // Wait 5 seconds before retrying
 //      delay(5000);
-      failDelay = 190;//delay for 19 seconds as other stuf each loop may take smoe time.
+      failDelay = 190;//delay for 19 seconds as other stuff each loop may take some time.
       return false;
     }
   }
