@@ -33,5 +33,29 @@ The controller board will publish the following messages when it successfully sw
 state/h1/c1/outside/s/e s=0
 state/h1/c1/outside/s/e s=1
 ```
-etc. when it susesflly switches the light on/off
-The state/ is added to the topic to show that the device is updade and so it don't get confused with the a command to control the board.
+
+The prefix <b>state/</b> is added to the topic to indicate that the device has been updated. It helps avoid confusion between device updates and commands to control the board.
+
+
+## HTML Interface
+
+To access the HTML interface of the controller, follow these steps:
+
+1. Connect your device to the same network as the controller.
+2. Open a web browser (e.g., Chrome, Firefox) on your device.
+
+If your controller module uses the default IP address of `192.168.1.170`, enter the following URL in your web browser's address bar:
+
+```
+http://192.168.1.170
+```
+
+**Note:** Depending on your controller device/modules configuration, the IP address of the controller module might be different. Make sure to use the correct IP address assigned to your module.
+
+Once the web page loads, you will have access to the HTML interface, where you can control and monitor the lights connected to the relay controller. The interface provides an intuitive user interface with options to turn on/off the lights and view their current status.
+
+**Important:** Some web browsers may display a security warning for non-encrypted connections. If you encounter such a warning, you can proceed by accepting the risk or configuring your browser to allow connections to non-encrypted pages.
+
+Feel free to explore the HTML interface and interact with the lights according to your requirements.
+
+
