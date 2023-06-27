@@ -5,7 +5,7 @@ This Arduino-based relay controller supports ATmega328P chips (Nano, Micro, UNO,
 
 The controller features a web server on port 80 and an MQTT client to toggle relays, enabling control over outside lights in me case but could be anyting that requires a relay etc. to turn it on and off.
 
-Switches can be connected to the Arduino pins for controlling the relays via MQTT or the web server on port 80.# Home Auto Arduino ethernet relay/lights controller
+Switches can be connected to the Arduino pins for controlling the relays via MQTT or the web server on port 80.
 
 ## MQTT examples
 To view MQTT messages on the server, run the following command:
