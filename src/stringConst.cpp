@@ -214,17 +214,19 @@ byte buildTopicForRelay(uint8_t relay, uint8_t r[], byte l) {
 void printRelayTopics(byte r[], byte l) {
     byte i;
     Serial.println(F("Printing rooms..."));
+    Serial.println(F("max string length:"));
+    Serial.println(l);
     for (i = 1; i <= NoRelays; i++) {
-        byte l;
-        l = buildTopicForRelay(i, r, l);
+        byte len;
+        len = buildTopicForRelay(i, r, l);
         {  // debug code.
             Serial.print(F("Print relay No.:"));
             Serial.println(i);
-            Serial.print(F("\tTotal string length now:"));
-            Serial.println(l);
+            Serial.print(F("\tTopic length:"));
+            Serial.println(len);
             Serial.print(F("\tMQTT topic: "));
             byte z;
-            for (z = 1; z <= l; z++) {
+            for (z = 1; z <= len; z++) {
                 if (r[z] <= 32) {
                     Serial.print('[');
                     Serial.print(r[z]);
@@ -233,7 +235,7 @@ void printRelayTopics(byte r[], byte l) {
                     Serial.print((char)r[z]);
                 }
             }
-            Serial.println("\nEnd.");
+            Serial.println("\n");
             // Serial.println("delay 2 seconds");
             // delay(2000);
         }

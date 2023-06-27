@@ -39,7 +39,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=60105",
+                "PLATFORMIO=60107",
                 "ARDUINO_AVR_NANO",
                 "VERSION=0.0.1",
                 "F_CPU=16000000L",

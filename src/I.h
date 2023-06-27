@@ -1,7 +1,7 @@
 #ifndef _in_h
 #define _in_h
 /*
- * Switches conected directly to a pin
+ * Switches connected directly to a pin
  */
 
 #include <Arduino.h>
