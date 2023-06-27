@@ -20,7 +20,7 @@ flowchart TD;
     C -->|Two| E[iPhone]
     C -->|Three| F[fa:fa-car Car]
     A --> |IO pins| H(Relays)
-    A --> |IO pins| I(expander)
+    A --> |IO pins| I(Expander:<br>MCP23017,<br>etc.)
     I --> |Expander IO pins|H
     A[Controller] --> |Arduino Software| K{Network protocol<br> libraries}
     H --> L(Lights)
